@@ -21,15 +21,15 @@ typedef enum
 
 typedef struct
 {
-    int width, height;
+    SDL_Rect rect;
     char const* label;
     SDL_Texture* label_texture;
-    unsigned int font_size;
 } Button;
 
 typedef struct
 {
     SDL_Texture* background;
+    SDL_FRect button_container;
     Button start_button;
     Button lboard_button;
 } Menu;
@@ -65,8 +65,8 @@ void Carcassone__destroy(Carcassone*);
 
 void Carcassone__run(Carcassone*);
 void Carcassone__Menu__render(Carcassone*);
-void Carcassone__Game__run(Carcassone*);
-void Carcassone__Lboard__run(Carcassone*);
+void Carcassone__Game__render(Carcassone*);
+void Carcassone__Lboard__render(Carcassone*);
 
 void Carcassone__handle_input(Carcassone*);
 void Carcassone__render(Carcassone*);

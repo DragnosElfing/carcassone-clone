@@ -1,7 +1,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_blendmode.h>
+#include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -80,16 +82,16 @@ Carcassone* Carcassone__construct(int width, int height, char const* title)
 
     Carcassone__Menu__construct(new_app);
     // Default értékek
-    // Carcassone__init_players(new_app);
-    // new_app->tileset_wrapper = TilesetWrapper__construct(new_app->renderer);
-    // if(new_app->tileset_wrapper.tile_set == NULL) {
-    //     SDL_LogError(SDL_LOG_CATEGORY_RENDER, "Nem lehetett betölteni az atlaszt!");
-    //     SDL_LogError(SDL_LOG_CATEGORY_RENDER, "%s", SDL_GetError());
-    // }
-    // Carcassone__init_board(new_app);
-    // new_app->pile_index = 0U;
-    // Carcassone__init_pile(new_app);
-    // Carcassone__draw_new(new_app);
+    Carcassone__init_players(new_app);
+    new_app->tileset_wrapper = TilesetWrapper__construct(new_app->renderer);
+    if(new_app->tileset_wrapper.tile_set == NULL) {
+        SDL_LogError(SDL_LOG_CATEGORY_RENDER, "Nem lehetett betölteni az atlaszt!");
+        SDL_LogError(SDL_LOG_CATEGORY_RENDER, "%s", SDL_GetError());
+    }
+    Carcassone__init_board(new_app);
+    new_app->pile_index = 0U;
+    Carcassone__init_pile(new_app);
+    Carcassone__draw_new(new_app);
 
     return new_app;
 }
@@ -106,18 +108,33 @@ void Carcassone__Menu__construct(Carcassone* this)
     }
     SDL_SetRenderDrawBlendMode(this->renderer, SDL_BLENDMODE_BLEND);
 
+    // TODO: rel coords, viewport
+    this->menu->button_container = (SDL_FRect){this->width/2.0f - 400, 250, 800, 600};
+
+    // TODO: seperate Button__construct
     this->menu->start_button = (Button){
-        .width = 200,
-        .height = 120,
-        .label = "Start",
-        .font_size = 64
+        .rect = {
+            this->menu->button_container.x + this->menu->button_container.w / 2 - 200 - 100,
+            this->menu->button_container.y + this->menu->button_container.h / 2 - 60, 
+            200, 120
+        },
+        .label = "Start"
     };
+    this->menu->start_button.label_texture = SDL_CreateTextureFromSurface(
+        this->renderer, TTF_RenderUTF8_Blended(this->default_font, this->menu->start_button.label, 
+        (SDL_Color){255, 255, 255, 255}));
     this->menu->lboard_button = (Button){
-        .width = 200,
-        .height = 120,
-        .label = "Dicsőséglista",
-        .font_size = 64
+        .rect = {
+            this->menu->button_container.x + this->menu->button_container.w / 2 + 200 - 100,
+            this->menu->button_container.y + this->menu->button_container.h / 2 - 60, 
+            200, 120
+        },
+        .label = "Dicsőséglista"
     };
+    this->menu->lboard_button.label_texture = SDL_CreateTextureFromSurface(
+        this->renderer, TTF_RenderUTF8_Blended(this->default_font, this->menu->lboard_button.label, 
+        (SDL_Color){255, 255, 255, 255}));
+    
 }
 void Carcassone__Menu__destroy(Carcassone* this)
 {
@@ -147,12 +164,12 @@ void Carcassone__destroy(Carcassone* this)
         }
         free(this->board);
     }
-    // for(size_t n = 0U; n < PILE_SIZE; ++n) {
-    //     if(this->card_pile[n] != NULL) {
-    //         free(this->card_pile[n]);
-    //     }
-    // }
-    // TilesetWrapper__destroy(&this->tileset_wrapper);
+    for(size_t n = 0U; n < PILE_SIZE; ++n) {
+        if(this->card_pile[n] != NULL) {
+            free(this->card_pile[n]);
+        }
+    }
+    TilesetWrapper__destroy(&this->tileset_wrapper);
     free(this);
 }
 
@@ -181,6 +198,14 @@ void Carcassone__handle_input(Carcassone* this)
             }
             break;
         case SDL_MOUSEBUTTONDOWN:
+            if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->menu->start_button.rect)) {
+                this->state = GAME;
+            }
+            if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->menu->lboard_button.rect)) {
+                this->state = LBOARD;
+
+            }
+
             if(this->state != GAME) break;
 
             for(int y = 0; y < GRID_SIZE; ++y) {
@@ -463,23 +488,37 @@ void Carcassone__Menu__render(Carcassone* this)
     SDL_SetRenderDrawColor(this->renderer, 255, 165, 105, 155);
     SDL_RenderFillRectF(this->renderer, NULL);
 
-    SDL_FRect menu_rect = {this->width/2.0f - 400, 250, 800, 600};
     SDL_SetRenderDrawColor(this->renderer, 255, 255, 255, 200);
-    SDL_RenderFillRectF(this->renderer, &menu_rect);
+    SDL_RenderFillRectF(this->renderer, &this->menu->button_container);
     SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 255);
-    SDL_RenderDrawRectF(this->renderer, &menu_rect);
+    SDL_RenderDrawRectF(this->renderer, &this->menu->button_container);
 
-    SDL_RenderFillRect(this->renderer, &(SDL_Rect){
-        menu_rect.x + menu_rect.w / 2 - 200 - this->menu->start_button.width / 2,
-        menu_rect.y + menu_rect.h / 2 - this->menu->start_button.height / 2,
-        this->menu->start_button.width, this->menu->start_button.height});
-    SDL_RenderFillRect(this->renderer, &(SDL_Rect){
-        menu_rect.x + menu_rect.w / 2 + 200 - this->menu->lboard_button.width / 2,
-        menu_rect.y + menu_rect.h / 2 - this->menu->lboard_button.height / 2,
-        this->menu->lboard_button.width, this->menu->lboard_button.height});
+    SDL_RenderFillRect(this->renderer, &this->menu->start_button.rect);
+    SDL_RenderCopy(this->renderer, 
+        this->menu->start_button.label_texture, NULL, &this->menu->start_button.rect);
+    SDL_RenderFillRect(this->renderer, &this->menu->lboard_button.rect);
+    SDL_RenderCopy(this->renderer, 
+        this->menu->lboard_button.label_texture, NULL, &this->menu->lboard_button.rect);
 
     SDL_RenderCopy(this->renderer, this->splash_title, NULL,
         &(SDL_Rect){this->width/2.0f - 400, 0, 800, 240});
+
+    SDL_RenderPresent(this->renderer);
+}
+void Carcassone__Lboard__render(Carcassone* this)
+{
+    SDL_RenderClear(this->renderer);
+    SDL_RenderPresent(this->renderer);
+}
+void Carcassone__Game__render(Carcassone* this)
+{
+    SDL_SetRenderDrawColor(this->renderer, 102, 102, 153, 255);
+    SDL_RenderClear(this->renderer);
+
+    Carcassone__render_board(this);
+    Carcassone__render_splash_title(this);
+    //Carcassone__render_player_stats(this);
+    Carcassone__render_drawn_tile(this);
 
     SDL_RenderPresent(this->renderer);
 }
@@ -493,8 +532,11 @@ void Carcassone__run(Carcassone* this)
             case MENU:
                 Carcassone__Menu__render(this);
                 break;
-            default:
-                Carcassone__render(this);
+            case LBOARD:
+                Carcassone__Lboard__render(this);
+                break;
+            case GAME:
+                Carcassone__Game__render(this);
                 break;
         }
     }

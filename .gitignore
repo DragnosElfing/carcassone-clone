@@ -1,2 +1,4 @@
 *.docx
-.vscode
+.vscode/
+bin/
+bin-int/
