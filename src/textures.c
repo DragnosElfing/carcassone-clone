@@ -19,8 +19,8 @@ SDL_Rect TilesetWrapper__get_texture_rect_for(TilesetWrapper* this, TileType typ
     short type_index = type;
 
     SDL_Rect rect;
-    rect.x = (type_index % (__TILETYPE_SIZE / 2)) * TILE_SIZE_SRC;
-    rect.y = (type_index / (__TILETYPE_SIZE / 2)) * TILE_SIZE_SRC;
+    rect.x = (type_index % (TILETYPE_SIZE__ / 2)) * TILE_SIZE_SRC;
+    rect.y = (type_index / (TILETYPE_SIZE__ / 2)) * TILE_SIZE_SRC;
     rect.w = TILE_SIZE_SRC;
     rect.h = TILE_SIZE_SRC;
 

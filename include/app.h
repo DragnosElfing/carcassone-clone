@@ -8,8 +8,8 @@
 #include "tile.h"
 #include "textures.h"
 
-#define GRID_SIZE 5
 #define PILE_SIZE 71
+#define GRID_SIZE 10
 //#define FPS 60
 
 typedef enum
@@ -36,6 +36,11 @@ typedef struct
 
 typedef struct
 {
+
+} Lboard;
+
+typedef struct
+{
     int width, height;
     bool is_running;
 
@@ -45,31 +50,34 @@ typedef struct
     Tile* card_pile[PILE_SIZE];
     size_t pile_index;
     Player players[2];
-    SDL_Texture** pile_counter;
+    unsigned short curr_player_index;
+    SDL_Texture* pile_counter[PILE_SIZE];
     TilesetWrapper tileset_wrapper;
 
     AppState state;
     Menu* menu;
+    Lboard* lboard;
 
     SDL_Window* window;
     SDL_Surface* window_icon;
     SDL_Texture* splash_title;
+    SDL_Texture* board_texture;
     SDL_Renderer* renderer;
     TTF_Font* default_font;
 } Carcassone;
 
 Carcassone* Carcassone__construct(int, int, char const*);
+void Carcassone__destroy(Carcassone*);
 void Carcassone__Menu__construct(Carcassone*);
 void Carcassone__Menu__destroy(Carcassone*);
-void Carcassone__destroy(Carcassone*);
+void Carcassone__Lboard__construct(Carcassone*);
+void Carcassone__Lboard__destroy(Carcassone*);
 
 void Carcassone__run(Carcassone*);
 void Carcassone__Menu__render(Carcassone*);
 void Carcassone__Game__render(Carcassone*);
 void Carcassone__Lboard__render(Carcassone*);
-
 void Carcassone__handle_input(Carcassone*);
-void Carcassone__render(Carcassone*);
 
 void Carcassone__render_board(Carcassone*);
 void Carcassone__render_splash_title(Carcassone*);

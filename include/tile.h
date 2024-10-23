@@ -37,7 +37,7 @@ typedef enum {
     CASTLE_CAP_WALL_ROAD_BY,
     CASTLE_SHIRT_WALL,
     CASTLE_SHIRT_WALL_ROAD_TO,
-    __TILETYPE_SIZE // = 19, jó kis trükk
+    TILETYPE_SIZE__ // = 19, jó kis trükk
 } TileType;
 
 typedef struct {

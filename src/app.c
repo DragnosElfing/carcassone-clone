@@ -1,11 +1,15 @@
+#include "player.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_blendmode.h>
+#include <SDL2/SDL_log.h>
+#include <SDL2/SDL_pixels.h>
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #ifdef _CRCLONE_DEBUG
@@ -15,15 +19,21 @@
 #include "app.h"
 #include "tile.h"
 
+#define DBG_LOG(x, ...) SDL_LogDebug(SDL_LOG_CATEGORY_CUSTOM, x, ##__VA_ARGS__);
+#define BLUE_COLOR 25, 30, 91
+#define WHITE_COLOR 255, 255, 255
+
 Carcassone* Carcassone__construct(int width, int height, char const* title)
 {
     srand(time(NULL));
 
-    // Hogy megjelenjenek a RENDER kategóriás hibák is (és minden egyéb)
-    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
+    #ifdef _CRCLONE_DEBUG
+    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
+    #else
+    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
+    #endif
 
     Carcassone* new_app = malloc(sizeof(Carcassone));
-    // Default értékek
     new_app->width = width;
     new_app->height = height;
     new_app->is_running = false;
@@ -34,6 +44,7 @@ Carcassone* Carcassone__construct(int width, int height, char const* title)
     new_app->splash_title = NULL;
     new_app->renderer = NULL;
     new_app->state = MENU;
+    new_app->pile_index = 0U;
 
     // Összes dolog betöltése
     if(SDL_Init(SDL_INIT_VIDEO) != 0 || TTF_Init() != 0) {
@@ -80,8 +91,19 @@ Carcassone* Carcassone__construct(int width, int height, char const* title)
         SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "%s", SDL_GetError());
     }
 
+    char counter_string[2];
+    for(size_t ti = 0U; ti < PILE_SIZE; ++ti) {
+        sprintf(counter_string, "%zu", PILE_SIZE - ti);
+        new_app->pile_counter[ti] = SDL_CreateTextureFromSurface(new_app->renderer,
+            TTF_RenderText_Blended(new_app->default_font, counter_string, (SDL_Color){WHITE_COLOR}));
+
+        if(new_app->pile_counter[ti] == NULL)
+            break;
+    }
+
+    new_app->board_texture = SDL_CreateTexture(new_app->renderer, SDL_PIXELFORMAT_RGBA8888,
+        SDL_TEXTUREACCESS_TARGET, 600, new_app->height - new_app->map_offset.y - 10);
     Carcassone__Menu__construct(new_app);
-    // Default értékek
     Carcassone__init_players(new_app);
     new_app->tileset_wrapper = TilesetWrapper__construct(new_app->renderer);
     if(new_app->tileset_wrapper.tile_set == NULL) {
@@ -89,9 +111,10 @@ Carcassone* Carcassone__construct(int width, int height, char const* title)
         SDL_LogError(SDL_LOG_CATEGORY_RENDER, "%s", SDL_GetError());
     }
     Carcassone__init_board(new_app);
-    new_app->pile_index = 0U;
     Carcassone__init_pile(new_app);
     Carcassone__draw_new(new_app);
+
+    Carcassone__Lboard__construct(new_app);
 
     return new_app;
 }
@@ -115,31 +138,39 @@ void Carcassone__Menu__construct(Carcassone* this)
     this->menu->start_button = (Button){
         .rect = {
             this->menu->button_container.x + this->menu->button_container.w / 2 - 200 - 100,
-            this->menu->button_container.y + this->menu->button_container.h / 2 - 60, 
+            this->menu->button_container.y + this->menu->button_container.h / 2 - 60,
             200, 120
         },
         .label = "Start"
     };
     this->menu->start_button.label_texture = SDL_CreateTextureFromSurface(
-        this->renderer, TTF_RenderUTF8_Blended(this->default_font, this->menu->start_button.label, 
+        this->renderer, TTF_RenderUTF8_Blended(this->default_font, this->menu->start_button.label,
         (SDL_Color){255, 255, 255, 255}));
     this->menu->lboard_button = (Button){
         .rect = {
             this->menu->button_container.x + this->menu->button_container.w / 2 + 200 - 100,
-            this->menu->button_container.y + this->menu->button_container.h / 2 - 60, 
+            this->menu->button_container.y + this->menu->button_container.h / 2 - 60,
             200, 120
         },
         .label = "Dicsőséglista"
     };
     this->menu->lboard_button.label_texture = SDL_CreateTextureFromSurface(
-        this->renderer, TTF_RenderUTF8_Blended(this->default_font, this->menu->lboard_button.label, 
+        this->renderer, TTF_RenderUTF8_Blended(this->default_font, this->menu->lboard_button.label,
         (SDL_Color){255, 255, 255, 255}));
-    
+
 }
 void Carcassone__Menu__destroy(Carcassone* this)
 {
     if(this->menu->background != NULL) SDL_DestroyTexture(this->menu->background);
     free(this->menu);
+}
+void Carcassone__Lboard__construct(Carcassone* this)
+{
+    Leaderboard l = Leaderboard__construct("res/data/records.dat");
+}
+void Carcassone__Lboard__destroy(Carcassone* this)
+{
+
 }
 
 void Carcassone__destroy(Carcassone* this)
@@ -147,10 +178,13 @@ void Carcassone__destroy(Carcassone* this)
     this->is_running = false;
 
     Carcassone__Menu__destroy(this);
-    // Először az SDL áll le
-    // TODO: ? no
+
     if(this->window_icon != NULL)   SDL_FreeSurface(this->window_icon);
     if(this->splash_title != NULL)  SDL_DestroyTexture(this->splash_title);
+    if(this->board_texture != NULL) SDL_DestroyTexture(this->board_texture);
+    for(size_t n = 0U; n < PILE_SIZE; ++n) {
+        if(this->pile_counter[n] != NULL) SDL_DestroyTexture(this->pile_counter[n]);
+    }
     if(this->window != NULL)        SDL_DestroyWindow(this->window);
     if(this->renderer != NULL)      SDL_DestroyRenderer(this->renderer);
     if(this->default_font != NULL)  TTF_CloseFont(this->default_font);
@@ -222,6 +256,10 @@ void Carcassone__handle_input(Carcassone* this)
                         Tile__set_rotation(curr_tile, this->drawn_tile->rotation);
 
                         Carcassone__draw_new(this);
+
+                        this->curr_player_index += 1;
+                        this->curr_player_index %= 2;
+                        DBG_LOG("Curr player: %hu", this->curr_player_index + 1);
                     }
                 }
             }
@@ -231,23 +269,12 @@ void Carcassone__handle_input(Carcassone* this)
     }
 }
 
-void Carcassone__render(Carcassone* this)
-{
-    SDL_SetRenderDrawColor(this->renderer, 102, 102, 153, 255);
-    SDL_RenderClear(this->renderer);
-
-    Carcassone__render_board(this);
-    Carcassone__render_splash_title(this);
-    //Carcassone__render_player_stats(this);
-    Carcassone__render_drawn_tile(this);
-
-    SDL_RenderPresent(this->renderer);
-}
-
 void Carcassone__init_players(Carcassone* this)
 {
     this->players[0] = (Player){.name = "Játékos Egy", .score = 0U, .is_turn_over = true};
     this->players[1] = (Player){.name = "Játékos Kettő", .score = 0U, .is_turn_over = true};
+
+    this->curr_player_index = 0U;
 }
 
 void Carcassone__init_pile(Carcassone* this)
@@ -323,10 +350,11 @@ void Carcassone__init_board(Carcassone* this)
 
 void Carcassone__render_board(Carcassone* this)
 {
+    // TODO: temp
     SDL_Rect viewport_rect = {this->map_offset.x, this->map_offset.y, 600, this->height - this->map_offset.y - 10};
-    SDL_RenderSetViewport(this->renderer, &viewport_rect);
+    SDL_SetRenderTarget(this->renderer, this->board_texture);
+    SDL_RenderClear(this->renderer);
 
-    // Cellák felrajzolása egy külön textúrára
     for(int y = 0U; y < GRID_SIZE; ++y) {
         for(int x = 0U; x < GRID_SIZE; ++x) {
             Tile* curr_tile = &this->board[x][y];
@@ -345,13 +373,14 @@ void Carcassone__render_board(Carcassone* this)
             SDL_RenderDrawRect(this->renderer, &tile_rect);
         }
     }
-    SDL_RenderSetViewport(this->renderer, NULL);
-    SDL_RenderDrawRect(this->renderer, &viewport_rect);
+
+    SDL_SetRenderTarget(this->renderer, NULL);
+    SDL_RenderCopy(this->renderer, this->board_texture, NULL, &viewport_rect);
+    //SDL_RenderDrawRect(this->renderer, &viewport_rect);
 }
 
 void Carcassone__render_splash_title(Carcassone* this)
 {
-    // TODO: too many arbitrary values
     SDL_RenderCopy(this->renderer, this->splash_title, NULL,
         &(SDL_Rect){this->map_offset.x, 0, 400, 120});
 }
@@ -359,30 +388,17 @@ void Carcassone__render_splash_title(Carcassone* this)
 void Carcassone__render_drawn_tile(Carcassone* this)
 {
     SDL_Rect ts_rect = TilesetWrapper__get_texture_rect_for(&this->tileset_wrapper, this->drawn_tile->type);
-    // if(tile_texture == NULL) {
-    //     SDL_LogCritical(SDL_LOG_CATEGORY_RENDER, "Nem sikerült megtalálni a megfelelő textúrát!");
-    //     SDL_LogCritical(SDL_LOG_CATEGORY_RENDER, "%s", SDL_GetError());
-    // }
 
     SDL_RenderCopyEx(this->renderer, this->tileset_wrapper.tile_set, &ts_rect,
         &(SDL_Rect){this->map_offset.x + 450, this->map_offset.y - TILE_SIZE, TILE_SIZE-5, TILE_SIZE-5},
         this->drawn_tile->rotation, NULL, SDL_FLIP_NONE);
 
-    char counter_string[2];
-    sprintf(counter_string, "%zu", PILE_SIZE - this->pile_index);
-
-    // SDL_Texture* pile_counter = SDL_CreateTextureFromSurface(this->renderer,
-    //     TTF_RenderText_Shaded(this->default_font, counter_string,
-    //         (SDL_Color){255, 255, 255, 255}, (SDL_Color){102, 102, 153, 255})); // TODO: transparent, change pixelformat
-    // if(pile_counter != NULL) {
-    //     SDL_Rect text_rect = {this->map_offset.x + 555, this->map_offset.y - TILE_SIZE/2, 50, 50};
-    //     if(PILE_SIZE - this->pile_index < 10) {
-    //         text_rect.w /= 2;
-    //         text_rect.x += text_rect.w/2;
-    //     }
-    //     SDL_RenderCopy(this->renderer, pile_counter, NULL, &text_rect);
-    //     SDL_DestroyTexture(pile_counter);
-    // }
+    SDL_Rect text_rect = {this->map_offset.x + 555, this->map_offset.y - TILE_SIZE/2, 50, 50};
+    if(PILE_SIZE - this->pile_index < 10) {
+        text_rect.w /= 2;
+        text_rect.x += text_rect.w/2;
+    }
+    SDL_RenderCopy(this->renderer, this->pile_counter[this->pile_index], NULL, &text_rect);
 
     // TODO: temp
     int mx, my;
@@ -474,8 +490,8 @@ void Carcassone__draw_new(Carcassone* this)
 {
     this->drawn_tile = this->card_pile[this->pile_index];
     ++this->pile_index;
-    if(this->pile_index >= PILE_SIZE ) {
-        SDL_Log("Kifogytunk a kártyákból!");
+    if(this->pile_index >= PILE_SIZE) {
+        DBG_LOG("Kifogytunk a kártyákból!");
         this->is_running = false;
     }
 }
@@ -488,16 +504,13 @@ void Carcassone__Menu__render(Carcassone* this)
     SDL_SetRenderDrawColor(this->renderer, 255, 165, 105, 155);
     SDL_RenderFillRectF(this->renderer, NULL);
 
-    SDL_SetRenderDrawColor(this->renderer, 255, 255, 255, 200);
-    SDL_RenderFillRectF(this->renderer, &this->menu->button_container);
-    SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 255);
-    SDL_RenderDrawRectF(this->renderer, &this->menu->button_container);
+    SDL_SetRenderDrawColor(this->renderer, BLUE_COLOR, 255);
 
     SDL_RenderFillRect(this->renderer, &this->menu->start_button.rect);
-    SDL_RenderCopy(this->renderer, 
+    SDL_RenderCopy(this->renderer,
         this->menu->start_button.label_texture, NULL, &this->menu->start_button.rect);
     SDL_RenderFillRect(this->renderer, &this->menu->lboard_button.rect);
-    SDL_RenderCopy(this->renderer, 
+    SDL_RenderCopy(this->renderer,
         this->menu->lboard_button.label_texture, NULL, &this->menu->lboard_button.rect);
 
     SDL_RenderCopy(this->renderer, this->splash_title, NULL,

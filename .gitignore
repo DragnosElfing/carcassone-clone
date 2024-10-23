@@ -1,4 +1,5 @@
 *.docx
+*.make
 .vscode/
 bin/
 bin-int/
