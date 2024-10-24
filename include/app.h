@@ -36,7 +36,8 @@ typedef struct
 
 typedef struct
 {
-
+    SDL_Texture* list_texture;
+    Button back_button;
 } Lboard;
 
 typedef struct

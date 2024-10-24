@@ -46,7 +46,8 @@ project "CarcassoneClone"
         disablewarnings {
             "unused-parameter",
             "newline-eof",
-            "padded"
+            "padded",
+            "switch-enum"
         }
 
     filter "configurations:Release"

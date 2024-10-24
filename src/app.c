@@ -20,20 +20,12 @@
 #include "app.h"
 #include "tile.h"
 
-#define DBG_LOG(x, ...) SDL_LogDebug(SDL_LOG_CATEGORY_CUSTOM, x, ##__VA_ARGS__);
+#define DBG_LOG(x, ...) SDL_LogDebug(SDL_LOG_CATEGORY_CUSTOM, x, ##__VA_ARGS__)
 #define BLUE_COLOR 25, 30, 91
 #define WHITE_COLOR 255, 255, 255
 
 Carcassone* Carcassone__construct(int width, int height, char const* title)
 {
-    srand(time(NULL));
-
-    #ifdef _CRCLONE_DEBUG
-    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
-    #else
-    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
-    #endif
-
     Carcassone* new_app = malloc(sizeof(Carcassone));
     new_app->width = width;
     new_app->height = height;
@@ -46,6 +38,12 @@ Carcassone* Carcassone__construct(int width, int height, char const* title)
     new_app->renderer = NULL;
     new_app->state = MENU;
     new_app->pile_index = 0U;
+
+    #ifdef _CRCLONE_DEBUG
+    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
+    #else
+    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
+    #endif
 
     // Összes dolog betöltése
     if(SDL_Init(SDL_INIT_VIDEO) != 0 || TTF_Init() != 0) {
@@ -96,11 +94,13 @@ Carcassone* Carcassone__construct(int width, int height, char const* title)
     for(size_t ti = 0U; ti < PILE_SIZE; ++ti) {
         sprintf(counter_string, "%zu", PILE_SIZE - ti);
         new_app->pile_counter[ti] = SDL_CreateTextureFromSurface(new_app->renderer,
-            TTF_RenderText_Blended(new_app->default_font, counter_string, (SDL_Color){WHITE_COLOR}));
+            TTF_RenderText_Blended(new_app->default_font, counter_string, (SDL_Color){WHITE_COLOR, 255}));
 
         if(new_app->pile_counter[ti] == NULL)
             break;
     }
+
+    srand(time(NULL));
 
     new_app->board_texture = SDL_CreateTexture(new_app->renderer, SDL_PIXELFORMAT_RGBA8888,
         SDL_TEXTUREACCESS_TARGET, 600, new_app->height - new_app->map_offset.y - 10);
@@ -142,7 +142,7 @@ void Carcassone__Menu__construct(Carcassone* this)
             this->menu->button_container.y + this->menu->button_container.h / 2 - 60,
             200, 120
         },
-        .label = "Start"
+        .label = "start"
     };
     this->menu->start_button.label_texture = SDL_CreateTextureFromSurface(
         this->renderer, TTF_RenderUTF8_Blended(this->default_font, this->menu->start_button.label,
@@ -153,7 +153,7 @@ void Carcassone__Menu__construct(Carcassone* this)
             this->menu->button_container.y + this->menu->button_container.h / 2 - 60,
             200, 120
         },
-        .label = "Dicsőséglista"
+        .label = "dicsőséglista"
     };
     this->menu->lboard_button.label_texture = SDL_CreateTextureFromSurface(
         this->renderer, TTF_RenderUTF8_Blended(this->default_font, this->menu->lboard_button.label,
@@ -163,16 +163,40 @@ void Carcassone__Menu__construct(Carcassone* this)
 void Carcassone__Menu__destroy(Carcassone* this)
 {
     if(this->menu->background != NULL) SDL_DestroyTexture(this->menu->background);
+    if(this->menu->start_button.label_texture != NULL) SDL_DestroyTexture(this->menu->start_button.label_texture);
+    if(this->menu->lboard_button.label_texture != NULL) SDL_DestroyTexture(this->menu->lboard_button.label_texture);
     free(this->menu);
 }
 void Carcassone__Lboard__construct(Carcassone* this)
 {
     this->leaderboard = Leaderboard__construct("res/data/records.dat");
     Leaderboard__sort(this->leaderboard);
+
+    this->lboard = malloc(sizeof(Lboard));
+
+    this->lboard->back_button = (Button){
+        .rect = {
+            this->width - 110, 10,
+            100, 50
+        },
+        .label = "vissza"
+    };
+    this->lboard->back_button.label_texture = SDL_CreateTextureFromSurface(
+        this->renderer, TTF_RenderUTF8_Blended(this->default_font, this->lboard->back_button.label,
+        (SDL_Color){0, 0, 0, 255}));
+
+    this->lboard->list_texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+        this->width / 2, this->height - 200);
+    SDL_SetRenderTarget(this->renderer, this->lboard->list_texture);
+    // TODO
+    SDL_SetRenderTarget(this->renderer, NULL);
 }
 void Carcassone__Lboard__destroy(Carcassone* this)
 {
     Leaderboard__destroy(this->leaderboard);
+    if(this->lboard->list_texture != NULL) SDL_DestroyTexture(this->lboard->list_texture);
+    if(this->lboard->back_button.label_texture != NULL) SDL_DestroyTexture(this->lboard->back_button.label_texture);
+    free(this->lboard);
 }
 
 void Carcassone__destroy(Carcassone* this)
@@ -247,6 +271,12 @@ void Carcassone__handle_input(Carcassone* this)
                 }
             }
 
+            if(this->state == LBOARD) {
+                if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->lboard->back_button.rect)) {
+                    this->state = MENU;
+                }
+            }
+
             if(this->state != GAME) break;
 
             for(int y = 0; y < GRID_SIZE; ++y) {
@@ -257,14 +287,15 @@ void Carcassone__handle_input(Carcassone* this)
                             && Carcassone__check_surrounding_tiles(this, (SDL_Point){x, y})
                     ) {
                         // TODO
-                        SDL_Point temp_new_local = {curr_tile->local_coords.x / TILE_SIZE, curr_tile->local_coords.y / TILE_SIZE};
+                        SDL_Point temp_new_local = {curr_tile->local_coords.x / TILE_SIZE,
+                            curr_tile->local_coords.y / TILE_SIZE};
                         Tile__construct(curr_tile, this->drawn_tile->type,
                             temp_new_local, this->map_offset);
                         Tile__set_rotation(curr_tile, this->drawn_tile->rotation);
 
                         Carcassone__draw_new(this);
 
-                        this->curr_player_index += 1;
+                        ++this->curr_player_index;
                         this->curr_player_index %= 2;
                         DBG_LOG("Curr player: %hu", this->curr_player_index + 1);
                     }
@@ -528,6 +559,16 @@ void Carcassone__Menu__render(Carcassone* this)
 void Carcassone__Lboard__render(Carcassone* this)
 {
     SDL_RenderClear(this->renderer);
+
+    SDL_SetRenderDrawColor(this->renderer, WHITE_COLOR, 255);
+    SDL_RenderFillRect(this->renderer, &this->lboard->back_button.rect);
+    SDL_RenderCopy(this->renderer,
+        this->lboard->back_button.label_texture, NULL, &this->lboard->back_button.rect);
+
+    SDL_RenderCopy(this->renderer, this->splash_title, NULL,
+        &(SDL_Rect){this->width/2.0f - 400, 0, 800, 240});
+
+    SDL_SetRenderDrawColor(this->renderer, BLUE_COLOR, 255);
     SDL_RenderPresent(this->renderer);
 }
 void Carcassone__Game__render(Carcassone* this)

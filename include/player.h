@@ -7,7 +7,7 @@
 #include <SDL2/SDL.h>
 
 typedef struct {
-    char const* name;
+    char name[24+1];
     unsigned int highscore;
 } Stat;
 
