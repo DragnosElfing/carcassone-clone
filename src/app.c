@@ -1,6 +1,7 @@
 #include "player.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_blendmode.h>
+#include <SDL2/SDL_keycode.h>
 #include <SDL2/SDL_log.h>
 #include <SDL2/SDL_pixels.h>
 #include <SDL2/SDL_rect.h>
@@ -166,11 +167,12 @@ void Carcassone__Menu__destroy(Carcassone* this)
 }
 void Carcassone__Lboard__construct(Carcassone* this)
 {
-    Leaderboard l = Leaderboard__construct("res/data/records.dat");
+    this->leaderboard = Leaderboard__construct("res/data/records.dat");
+    Leaderboard__sort(this->leaderboard);
 }
 void Carcassone__Lboard__destroy(Carcassone* this)
 {
-
+    Leaderboard__destroy(this->leaderboard);
 }
 
 void Carcassone__destroy(Carcassone* this)
@@ -178,6 +180,7 @@ void Carcassone__destroy(Carcassone* this)
     this->is_running = false;
 
     Carcassone__Menu__destroy(this);
+    Carcassone__Lboard__destroy(this);
 
     if(this->window_icon != NULL)   SDL_FreeSurface(this->window_icon);
     if(this->splash_title != NULL)  SDL_DestroyTexture(this->splash_title);
@@ -220,6 +223,9 @@ void Carcassone__handle_input(Carcassone* this)
             if(this->state != GAME) break;
 
             switch(event.key.keysym.sym) {
+                case SDLK_ESCAPE:
+                    this->is_running = false;
+                    break;
                 case SDLK_d:
                     Carcassone__draw_new(this);
                     break;
@@ -232,12 +238,13 @@ void Carcassone__handle_input(Carcassone* this)
             }
             break;
         case SDL_MOUSEBUTTONDOWN:
-            if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->menu->start_button.rect)) {
-                this->state = GAME;
-            }
-            if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->menu->lboard_button.rect)) {
-                this->state = LBOARD;
-
+            if(this->state == MENU) {
+                if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->menu->start_button.rect)) {
+                    this->state = GAME;
+                }
+                if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->menu->lboard_button.rect)) {
+                    this->state = LBOARD;
+                }
             }
 
             if(this->state != GAME) break;
@@ -271,8 +278,8 @@ void Carcassone__handle_input(Carcassone* this)
 
 void Carcassone__init_players(Carcassone* this)
 {
-    this->players[0] = (Player){.name = "Játékos Egy", .score = 0U, .is_turn_over = true};
-    this->players[1] = (Player){.name = "Játékos Kettő", .score = 0U, .is_turn_over = true};
+    this->players[0] = (Player){.stat.name = "Játékos Egy", .score = 0U, .is_turn_over = true};
+    this->players[1] = (Player){.stat.name = "Játékos Kettő", .score = 0U, .is_turn_over = true};
 
     this->curr_player_index = 0U;
 }
@@ -411,7 +418,7 @@ void Carcassone__render_drawn_tile(Carcassone* this)
 void Carcassone__render_player_stats(Carcassone* this)
 {
     SDL_Texture* player1_handle = SDL_CreateTextureFromSurface(this->renderer,
-        TTF_RenderUTF8_Shaded(this->default_font, this->players[0].name,
+        TTF_RenderUTF8_Shaded(this->default_font, this->players[0].stat.name,
             (SDL_Color){100, 190, 255, 255}, (SDL_Color){102, 102, 153, 255}));
     if(player1_handle != NULL) {
         SDL_RenderCopy(this->renderer, player1_handle, NULL, &(SDL_Rect){10, 10, 200, 50});
@@ -419,7 +426,7 @@ void Carcassone__render_player_stats(Carcassone* this)
     }
 
     SDL_Texture* player2_handle = SDL_CreateTextureFromSurface(this->renderer,
-        TTF_RenderUTF8_Shaded(this->default_font, this->players[1].name,
+        TTF_RenderUTF8_Shaded(this->default_font, this->players[1].stat.name,
             (SDL_Color){255, 190, 100, 255}, (SDL_Color){102, 102, 153, 255}));
     if(player2_handle != NULL) {
         SDL_RenderCopy(this->renderer, player2_handle, NULL,
@@ -492,7 +499,7 @@ void Carcassone__draw_new(Carcassone* this)
     ++this->pile_index;
     if(this->pile_index >= PILE_SIZE) {
         DBG_LOG("Kifogytunk a kártyákból!");
-        this->is_running = false;
+        this->state = MENU;
     }
 }
 

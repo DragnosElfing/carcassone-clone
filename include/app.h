@@ -53,6 +53,7 @@ typedef struct
     unsigned short curr_player_index;
     SDL_Texture* pile_counter[PILE_SIZE];
     TilesetWrapper tileset_wrapper;
+    Leaderboard* leaderboard;
 
     AppState state;
     Menu* menu;

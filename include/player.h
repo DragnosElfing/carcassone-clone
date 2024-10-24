@@ -9,6 +9,10 @@
 typedef struct {
     char const* name;
     unsigned int highscore;
+} Stat;
+
+typedef struct {
+    Stat stat;
     unsigned int matches_count;
 
     // Csak ha épp játékban van
@@ -22,12 +26,12 @@ typedef struct {
 } Player;
 
 typedef struct {
-    Player* entries;
+    Stat* entries;
     size_t entries_size;
 } Leaderboard;
 
-Leaderboard Leaderboard__construct(char const*);
+Leaderboard* Leaderboard__construct(char const*);
 void Leaderboard__sort(Leaderboard*);
-void Leaderbord__destroy(Leaderboard*);
+void Leaderboard__destroy(Leaderboard*);
 
 #endif
