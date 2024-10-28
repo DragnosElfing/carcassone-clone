@@ -1,0 +1,13 @@
+<map id="src/textures.c" name="src/textures.c">
+<area shape="rect" id="node1" title=" " alt="" coords="362,5,465,32"/>
+<area shape="rect" id="node2" href="$textures_8h.html" title=" " alt="" coords="373,80,453,107"/>
+<area shape="rect" id="node3" href="$tile_8h.html" title=" " alt="" coords="281,155,332,181"/>
+<area shape="rect" id="node5" title=" " alt="" coords="332,379,471,405"/>
+<area shape="rect" id="node4" title=" " alt="" coords="382,229,519,256"/>
+<area shape="rect" id="node6" title=" " alt="" coords="69,229,208,256"/>
+<area shape="rect" id="node7" title=" " alt="" coords="5,379,80,405"/>
+<area shape="rect" id="node8" href="$meeple_8h.html" title=" " alt="" coords="232,229,307,256"/>
+<area shape="rect" id="node9" href="$player_8h.html" title=" " alt="" coords="227,304,293,331"/>
+<area shape="rect" id="node10" title=" " alt="" coords="124,379,188,405"/>
+<area shape="rect" id="node11" title=" " alt="" coords="212,379,308,405"/>
+</map>

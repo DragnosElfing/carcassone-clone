@@ -20,10 +20,18 @@
 #include "app.h"
 #include "tile.h"
 
-#define DBG_LOG(x, ...) SDL_LogDebug(SDL_LOG_CATEGORY_CUSTOM, x, ##__VA_ARGS__)
-#define BLUE_COLOR 25, 30, 91
-#define WHITE_COLOR 255, 255, 255
-
+/**
+ * @brief Initializes all the struct members, SDL and TTF contexts.
+ *
+ * Long description.
+ * Bruh.
+ * Must call Carcassone__destroy(Carcassone*) to properly release allocated memory.
+ *
+ * @param width Width of the SDL window.
+ * @param height Height of the SDL window.
+ * @param title Title of the SDL window.
+ * @return A pointer to the new, dynamically created Carcassone struct.
+ */
 Carcassone* Carcassone__construct(int width, int height, char const* title)
 {
     Carcassone* new_app = malloc(sizeof(Carcassone));
@@ -94,7 +102,7 @@ Carcassone* Carcassone__construct(int width, int height, char const* title)
     for(size_t ti = 0U; ti < PILE_SIZE; ++ti) {
         sprintf(counter_string, "%zu", PILE_SIZE - ti);
         new_app->pile_counter[ti] = SDL_CreateTextureFromSurface(new_app->renderer,
-            TTF_RenderText_Blended(new_app->default_font, counter_string, (SDL_Color){WHITE_COLOR, 255}));
+            TTF_RenderText_Blended(new_app->default_font, counter_string, (SDL_Color){COLOR_WHITE}));
 
         if(new_app->pile_counter[ti] == NULL)
             break;
@@ -187,9 +195,22 @@ void Carcassone__Lboard__construct(Carcassone* this)
 
     this->lboard->list_texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
         this->width / 2, this->height - 200);
+
+    char score_string[10+1];
     SDL_SetRenderTarget(this->renderer, this->lboard->list_texture);
-    // TODO
+    for(size_t place = 0U; place < MIN(5, this->leaderboard->entries_size); ++place) {
+        SDL_RenderCopy(this->renderer, SDL_CreateTextureFromSurface(
+            this->renderer, TTF_RenderUTF8_Blended(this->default_font, this->leaderboard->entries[place].name,
+            (SDL_Color){COLOR_WHITE})), NULL, &(SDL_Rect){0, 100*place, 200, 80});
+
+        sprintf(score_string, "%u", this->leaderboard->entries[place].highscore);
+        SDL_RenderCopy(this->renderer, SDL_CreateTextureFromSurface(
+            this->renderer, TTF_RenderUTF8_Blended(this->default_font, score_string,
+            (SDL_Color){COLOR_WHITE})), NULL, &(SDL_Rect){230, 100*place, 50, 80});
+    }
     SDL_SetRenderTarget(this->renderer, NULL);
+
+    SDL_SetTextureBlendMode(this->lboard->list_texture, SDL_BLENDMODE_BLEND);
 }
 void Carcassone__Lboard__destroy(Carcassone* this)
 {
@@ -542,7 +563,7 @@ void Carcassone__Menu__render(Carcassone* this)
     SDL_SetRenderDrawColor(this->renderer, 255, 165, 105, 155);
     SDL_RenderFillRectF(this->renderer, NULL);
 
-    SDL_SetRenderDrawColor(this->renderer, BLUE_COLOR, 255);
+    SDL_SetRenderDrawColor(this->renderer, COLOR_BLUE);
 
     SDL_RenderFillRect(this->renderer, &this->menu->start_button.rect);
     SDL_RenderCopy(this->renderer,
@@ -560,7 +581,7 @@ void Carcassone__Lboard__render(Carcassone* this)
 {
     SDL_RenderClear(this->renderer);
 
-    SDL_SetRenderDrawColor(this->renderer, WHITE_COLOR, 255);
+    SDL_SetRenderDrawColor(this->renderer, COLOR_WHITE);
     SDL_RenderFillRect(this->renderer, &this->lboard->back_button.rect);
     SDL_RenderCopy(this->renderer,
         this->lboard->back_button.label_texture, NULL, &this->lboard->back_button.rect);
@@ -568,7 +589,10 @@ void Carcassone__Lboard__render(Carcassone* this)
     SDL_RenderCopy(this->renderer, this->splash_title, NULL,
         &(SDL_Rect){this->width/2.0f - 400, 0, 800, 240});
 
-    SDL_SetRenderDrawColor(this->renderer, BLUE_COLOR, 255);
+    SDL_RenderCopy(this->renderer, this->lboard->list_texture, NULL,
+        &(SDL_Rect){150, 300, 500, 500});
+
+    SDL_SetRenderDrawColor(this->renderer, COLOR_BLUE);
     SDL_RenderPresent(this->renderer);
 }
 void Carcassone__Game__render(Carcassone* this)
@@ -600,5 +624,8 @@ void Carcassone__run(Carcassone* this)
                 Carcassone__Game__render(this);
                 break;
         }
+
+        // TOOD: temp until FPS is implemented
+        SDL_Delay(1);
     }
 }

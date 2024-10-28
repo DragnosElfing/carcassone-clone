@@ -1,0 +1,25 @@
+var structCarcassone =
+[
+    [ "board", "structCarcassone.html#a5546ca7cb17a870a3330edb8656147fd", null ],
+    [ "board_texture", "structCarcassone.html#abc5d35654235b3a9e8a0bb6661c6cbdd", null ],
+    [ "card_pile", "structCarcassone.html#afa79c0579797f6a8a40b275f61a55391", null ],
+    [ "curr_player_index", "structCarcassone.html#a81fa2c8bdc5381dd04f672945fe02b19", null ],
+    [ "default_font", "structCarcassone.html#affa118348eb72a2fcb3edb6be34f6419", null ],
+    [ "drawn_tile", "structCarcassone.html#ae8ecccf717ffbf34e5eed2989dd56d39", null ],
+    [ "height", "structCarcassone.html#ae2b52335aa8a4e93213ec8521a67a033", null ],
+    [ "is_running", "structCarcassone.html#a178f5f5b9769a22a239219f17a69a599", null ],
+    [ "lboard", "structCarcassone.html#a2f228cbaf9e4118bd400703570cc94d3", null ],
+    [ "leaderboard", "structCarcassone.html#a79e081db7b3570ad47d13076d3a32aff", null ],
+    [ "map_offset", "structCarcassone.html#a6495010c0608c5007f3a00865841ed26", null ],
+    [ "menu", "structCarcassone.html#a884f9c1d77cc0b058b7dd9b14069775b", null ],
+    [ "pile_counter", "structCarcassone.html#a90ed88da9a8c8a35461944413748befc", null ],
+    [ "pile_index", "structCarcassone.html#a58dfff90f5d53ef44e89768aaf21c9c9", null ],
+    [ "players", "structCarcassone.html#af92b996d5bcd36ebd073be8c1ead1f58", null ],
+    [ "renderer", "structCarcassone.html#a9e0fbcfbe14dab5cdf13e71dab2418a5", null ],
+    [ "splash_title", "structCarcassone.html#ac9ff55e30419e6f02bf4a0b5bf0db1a7", null ],
+    [ "state", "structCarcassone.html#ad428d476ec8f0a4dafdd8340db5e4170", null ],
+    [ "tileset_wrapper", "structCarcassone.html#a2ce2af02e68df679fa97237495bbe973", null ],
+    [ "width", "structCarcassone.html#a7f746fc6ab483bd2138421054ff9dc34", null ],
+    [ "window", "structCarcassone.html#a63578e9dee60d13f8c17704be7084601", null ],
+    [ "window_icon", "structCarcassone.html#a7e092e43595c27b67f3a42ad6bd47567", null ]
+];

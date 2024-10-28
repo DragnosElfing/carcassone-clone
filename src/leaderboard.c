@@ -37,8 +37,8 @@ static int entry_cmp(void const* e1, void const* e2)
     Stat s1 = *(Stat const*)e1;
     Stat s2 = *(Stat const*)e2;
 
-    if (s1.highscore < s2.highscore) return -1;
-    if (s1.highscore > s2.highscore) return 1;
+    if (s1.highscore > s2.highscore) return -1;
+    if (s1.highscore < s2.highscore) return 1;
     return 0;
 }
 

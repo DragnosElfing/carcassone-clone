@@ -10,7 +10,11 @@
 
 #define PILE_SIZE 71
 #define GRID_SIZE 10
-//#define FPS 60
+#define FPS 60
+#define MIN(x, y) ((x < y)?x:y)
+#define COLOR_BLUE 25, 30, 91, 255
+#define COLOR_WHITE 255, 255, 255, 255
+#define DBG_LOG(x, ...) SDL_LogDebug(SDL_LOG_CATEGORY_CUSTOM, x, ##__VA_ARGS__)
 
 typedef enum
 {
