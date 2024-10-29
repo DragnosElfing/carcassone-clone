@@ -26,9 +26,15 @@ typedef enum
 typedef struct
 {
     SDL_Rect rect;
-    char const* label;
+    char* label;
     SDL_Texture* label_texture;
 } Button;
+
+typedef struct
+{
+    Button prompt;
+    bool is_active;
+} Prompt;
 
 typedef struct
 {
@@ -55,6 +61,7 @@ typedef struct
     Tile* card_pile[PILE_SIZE];
     size_t pile_index;
     Player players[2];
+    Prompt player_name_inputs[2];
     unsigned short curr_player_index;
     SDL_Texture* pile_counter[PILE_SIZE];
     TilesetWrapper tileset_wrapper;

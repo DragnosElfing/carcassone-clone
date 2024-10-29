@@ -9,23 +9,21 @@ Leaderboard* Leaderboard__construct(char const* records_file_path)
     FILE* records_f = fopen(records_file_path, "r");
     if(records_f == NULL) return NULL;
 
-    size_t entries = 0U;
     char name[24+1];
     unsigned int record;
-    while(fscanf(records_f, "%24s %u", name, &record) != EOF) {
-        ++entries;
-    }
-
-    new_lboard->entries = malloc(entries * sizeof(Stat));
-    new_lboard->entries_size = entries;
-    rewind(records_f);
-
+    size_t entries_size = 1U;
+    new_lboard->entries = malloc(entries_size * sizeof(Stat));
     size_t entry_idx = 0U;
     while(fscanf(records_f, "%24s %u", name, &record) != EOF) {
+        if(entry_idx >= entries_size) {
+            entries_size *= 2;
+            new_lboard->entries = realloc(new_lboard->entries, entries_size * sizeof(Stat));
+        }
         strcpy(new_lboard->entries[entry_idx].name, name);
         new_lboard->entries[entry_idx].highscore = record;
         ++entry_idx;
     }
+    new_lboard->entries_size = entry_idx;
 
     fclose(records_f);
 

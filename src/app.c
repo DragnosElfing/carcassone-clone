@@ -469,6 +469,8 @@ void Carcassone__render_drawn_tile(Carcassone* this)
 
 void Carcassone__render_player_stats(Carcassone* this)
 {
+    return;
+    
     SDL_Texture* player1_handle = SDL_CreateTextureFromSurface(this->renderer,
         TTF_RenderUTF8_Shaded(this->default_font, this->players[0].stat.name,
             (SDL_Color){100, 190, 255, 255}, (SDL_Color){102, 102, 153, 255}));
@@ -602,7 +604,7 @@ void Carcassone__Game__render(Carcassone* this)
 
     Carcassone__render_board(this);
     Carcassone__render_splash_title(this);
-    //Carcassone__render_player_stats(this);
+    Carcassone__render_player_stats(this);
     Carcassone__render_drawn_tile(this);
 
     SDL_RenderPresent(this->renderer);
