@@ -5,33 +5,40 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
+#include "meeple.h"
+
+#define MAX_MEEPLES 7
+
+typedef struct {
+    char name[24+1];
+    unsigned int score;
+    unsigned int highscore;
+
+    Meeple meeples[MAX_MEEPLES];
+
+    // Textúrák
+    SDL_Texture* handle; // ? not needed
+    SDL_Texture* score_counter;
+    SDL_Texture* turn_indicator;
+    SDL_Texture* stat_panel;
+} Player;
+Player* Player__construct(char*, unsigned int);
+void Player__toggle_turn_active(Player*);
+void Player__update_score(Player*);
+void Player__destroy(Player*);
 
 typedef struct {
     char name[24+1];
     unsigned int highscore;
-} Stat;
+} LeaderboardEntry;
 
 typedef struct {
-    Stat stat;
-    unsigned int matches_count;
-
-    // Csak ha épp játékban van
-    unsigned int score;
-    bool is_turn_over;
-
-    // Textúrák
-    SDL_Texture* handle;
-    SDL_Texture* score_counter;
-    SDL_Texture* turn_indicator;
-} Player;
-
-typedef struct {
-    Stat* entries;
+    LeaderboardEntry* entries;
     size_t entries_size;
 } Leaderboard;
-
 Leaderboard* Leaderboard__construct(char const*);
-void Leaderboard__sort(Leaderboard*);
 void Leaderboard__destroy(Leaderboard*);
+void Leaderboard__sort(Leaderboard*);
+unsigned int Leaderboard__get_highscore_for(Leaderboard*, Player*);
 
 #endif

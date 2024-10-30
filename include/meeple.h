@@ -1,11 +1,19 @@
 #ifndef CRCLONE_MEEPLE_H
 #define CRCLONE_MEEPLE_H
 
-#include "player.h"
+#include <stdbool.h>
+#include <SDL2/SDL.h>
+#include "tile.h"
 
 typedef struct {
-    Player* owner;
+    unsigned int x, y;
+    Tile* tile;
     SDL_Texture* texture;
+    bool is_placed;
 } Meeple;
+Meeple Meeple__construct();
+void Meeple__place_on(Meeple*, unsigned int, unsigned int);
+void Meeple__reclaim(Meeple*);
+void Meeple__destroy(Meeple*);
 
 #endif

@@ -1,17 +1,25 @@
-#include "textures.h"
+#include <SDL2/SDL.h>
+
+#include "tile.h"
 
 TilesetWrapper TilesetWrapper__construct(SDL_Renderer* renderer)
 {
     TilesetWrapper new_tswrapper;
-    new_tswrapper.tile_set = SDL_CreateTextureFromSurface(renderer, SDL_LoadBMP("res/tileset.bmp"));
+    
+    SDL_Surface* tileset_img = SDL_LoadBMP("res/tileset.bmp");
+    if(tileset_img == NULL) {
+        SDL_LogCritical(SDL_LOG_CATEGORY_ASSERT, "Nem sikerült a res/tileset.bmp beolvasása!\n%s", SDL_GetError());
+        return new_tswrapper;
+    }
+    new_tswrapper.tile_set = SDL_CreateTextureFromSurface(renderer, tileset_img);
+    SDL_FreeSurface(tileset_img);
+
     return new_tswrapper;
 }
 
 void TilesetWrapper__destroy(TilesetWrapper* this)
 {
-    if(this->tile_set != NULL) {
-        SDL_DestroyTexture(this->tile_set);
-    }
+    if(this->tile_set != NULL) SDL_DestroyTexture(this->tile_set);
 }
 
 SDL_Rect TilesetWrapper__get_texture_rect_for(TilesetWrapper* this, TileType type)

@@ -1,12 +1,4 @@
-#include "player.h"
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_blendmode.h>
-#include <SDL2/SDL_keycode.h>
-#include <SDL2/SDL_log.h>
-#include <SDL2/SDL_pixels.h>
-#include <SDL2/SDL_rect.h>
-#include <SDL2/SDL_render.h>
-#include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +9,7 @@
 #include "debug/debugmalloc.h"
 #endif
 
+#include "player.h"
 #include "app.h"
 #include "tile.h"
 
@@ -237,7 +230,7 @@ void Carcassone__destroy(Carcassone* this)
     if(this->renderer != NULL)      SDL_DestroyRenderer(this->renderer);
     if(this->default_font != NULL)  TTF_CloseFont(this->default_font);
     if(TTF_WasInit() != 0)          TTF_Quit();
-    if(SDL_WasInit(0) != 0)         SDL_Quit();
+    if(SDL_WasInit(0) != 0)   SDL_Quit();
 
     // Utánna minden mást
     if(this->board != NULL) {

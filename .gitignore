@@ -1,5 +1,6 @@
 *.docx
 *.make
 .vscode/
+.idea/
 bin/
 bin-int/

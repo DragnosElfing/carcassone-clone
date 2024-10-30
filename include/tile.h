@@ -1,11 +1,9 @@
 #ifndef CRCLONE_TILE_H
 #define CRCLONE_TILE_H
 
-#include <SDL2/SDL_pixels.h>
-#include <SDL2/SDL_render.h>
-#include <SDL2/SDL_stdinc.h>
+#include <SDL2/SDL.h>
+
 #include <stdbool.h>
-#include "meeple.h"
 
 #define TILE_SIZE 100
 #define TILE_SIZE_SRC 64
@@ -16,6 +14,13 @@ typedef enum {
     ROAD,
     FIELD
 } ConnectionType;
+
+typedef enum {
+    NORTH = 0U,
+    EAST = 1U,
+    SOUTH = 2U,
+    WEST = 3U
+} ConnectionDirection;
 
 typedef enum {
     EMPTY = -1,
@@ -37,24 +42,28 @@ typedef enum {
     CASTLE_CAP_WALL_ROAD_BY,
     CASTLE_SHIRT_WALL,
     CASTLE_SHIRT_WALL_ROAD_TO,
-    TILETYPE_SIZE__ // = 19, jó kis trükk
+    TILETYPE_SIZE__ // = 19, trick
 } TileType;
 
 typedef struct {
-    ConnectionType north, east, south, west;
+    ConnectionType connections[4]; // a négy oldal: north, east, south, west
     TileType type;
-    Meeple* meeples;
-    size_t meeples_size;
-    SDL_Point local_coords, global_coords;
-    int rotation; // `int`, mert csak egész foknyi forgatást engedek
+    SDL_Point local_coords, global_coords; // bal felső sarok koord
+    unsigned short rotation; // `unsigned int`, mert csak egész foknyi forgatást engedek
     bool rotatable;
 } Tile;
-
 void Tile__construct(Tile*, TileType, SDL_Point, SDL_Point);
 bool Tile__point_in_tile(Tile*, SDL_Point);
 void Tile__move_by(Tile*, float, float);
 void Tile__rotate(Tile*);
-void Tile__set_rotation(Tile*, int);
-void Tile__change_type(Tile*, TileType, int);
+void Tile__set_rotation(Tile*, unsigned short);
+void Tile__set_type(Tile*, TileType, unsigned short);
+
+typedef struct {
+    SDL_Texture* tile_set;
+} TilesetWrapper;
+TilesetWrapper TilesetWrapper__construct(SDL_Renderer*);
+void TilesetWrapper__destroy(TilesetWrapper*);
+SDL_Rect TilesetWrapper__get_texture_rect_for(TilesetWrapper*, TileType);
 
 #endif

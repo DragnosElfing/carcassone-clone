@@ -1,3 +1,4 @@
+#include "math.h"
 #include "tile.h"
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_log.h>
@@ -11,7 +12,7 @@ void Tile__construct(Tile* this, TileType type, SDL_Point lcoords, SDL_Point off
 
     this->rotatable = true;
     this->rotation = 0;
-    Tile__change_type(this, type, this->rotation);
+    Tile__set_type(this, type, this->rotation);
 }
 
 bool Tile__point_in_tile(Tile* this, SDL_Point pt)
@@ -31,146 +32,135 @@ void Tile__rotate(Tile* this)
     Tile__set_rotation(this, this->rotation + 90);
 }
 
-void Tile__set_rotation(Tile* this, int new_rotation)
+void Tile__set_rotation(Tile* this, unsigned short new_rotation)
 {
     if(!this->rotatable) return;
 
-    // TODO: no
     new_rotation %= 360;
-    for(int r = this->rotation; r != new_rotation;) {
-        r += 90;
-        r %= 360;
-
-        ConnectionType old_north = this->north;
-        ConnectionType old_east = this->east;
-        ConnectionType old_south = this->south;
-        ConnectionType old_west = this->west;
-
-        this->north = old_west;
-        this->east = old_north;
-        this->south = old_east;
-        this->west = old_south;
-
+    unsigned int rotations_needed = abs(new_rotation - this->rotation) / 90;
+    ConnectionType* prev_connections = this->connections;
+    for(unsigned int dir = NORTH; dir <= WEST; ++dir) {
+        this->connections[dir] = prev_connections[(dir + rotations_needed) % 4];
     }
-    this->rotation = new_rotation;
 
+    this->rotation = new_rotation;
 }
 
-void Tile__change_type(Tile* this, TileType new_type, int new_rotation)
+void Tile__set_type(Tile* this, TileType new_type, unsigned short new_rotation)
 {
     this->type = new_type;
     switch(new_type) {
         case FIELD_CLOISTER_ROAD_S:
-            this->north = FIELD;
-            this->east = FIELD;
-            this->south = ROAD;
-            this->west = FIELD;
+            this->connections[NORTH] = FIELD;
+            this->connections[EAST] = FIELD;
+            this->connections[SOUTH] = ROAD;
+            this->connections[WEST] = FIELD;
             break;
         case FIELD_CLOISTER_ROAD_NS:
-            this->north = ROAD;
-            this->east = FIELD;
-            this->south = ROAD;
-            this->west = FIELD;
+            this->connections[NORTH] = ROAD;
+            this->connections[EAST] = FIELD;
+            this->connections[SOUTH] = ROAD;
+            this->connections[WEST] = FIELD;
             break;
         case FIELD_VILLAGE_ROAD_S:
-            this->north = FIELD;
-            this->east = FIELD;
-            this->south = ROAD;
-            this->west = FIELD;
+            this->connections[NORTH] = FIELD;
+            this->connections[EAST] = FIELD;
+            this->connections[SOUTH] = ROAD;
+            this->connections[WEST] = FIELD;
             break;
         case FIELD_VILLAGE_ROAD_NS:
-            this->north = ROAD;
-            this->east = FIELD;
-            this->south = ROAD;
-            this->west = FIELD;
+            this->connections[NORTH] = ROAD;
+            this->connections[EAST] = FIELD;
+            this->connections[SOUTH] = ROAD;
+            this->connections[WEST] = FIELD;
             break;
         case ROAD_NS:
-            this->north = ROAD;
-            this->east = FIELD;
-            this->south = ROAD;
-            this->west = FIELD;
+            this->connections[NORTH] = ROAD;
+            this->connections[EAST] = FIELD;
+            this->connections[SOUTH] = ROAD;
+            this->connections[WEST] = FIELD;
             break;
         case ROAD_NW:
-            this->north = ROAD;
-            this->east = FIELD;
-            this->south = FIELD;
-            this->west = ROAD;
+            this->connections[NORTH] = ROAD;
+            this->connections[EAST] = FIELD;
+            this->connections[SOUTH] = FIELD;
+            this->connections[WEST] = ROAD;
             break;
         case ROAD_NWE:
-            this->north = ROAD;
-            this->east = ROAD;
-            this->south = FIELD;
-            this->west = ROAD;
+            this->connections[NORTH] = ROAD;
+            this->connections[EAST] = ROAD;
+            this->connections[SOUTH] = FIELD;
+            this->connections[WEST] = ROAD;
             break;
         case ROAD_NSWE:
-            this->north = ROAD;
-            this->east = ROAD;
-            this->south = ROAD;
-            this->west = ROAD;
+            this->connections[NORTH] = ROAD;
+            this->connections[EAST] = ROAD;
+            this->connections[SOUTH] = ROAD;
+            this->connections[WEST] = ROAD;
             this->rotatable = false;
             break;
         case CASTLE_PANTHEON:
         case CASTLE_TOWN:
-            this->north = CASTLE;
-            this->east = CASTLE;
-            this->south = CASTLE;
-            this->west = CASTLE;
+            this->connections[NORTH] = CASTLE;
+            this->connections[EAST] = CASTLE;
+            this->connections[SOUTH] = CASTLE;
+            this->connections[WEST] = CASTLE;
             this->rotatable = false;
             break;
         case CASTLE_TUNNEL:
-            this->north = CASTLE;
-            this->east = FIELD;
-            this->south = CASTLE;
-            this->west = FIELD;
+            this->connections[NORTH] = CASTLE;
+            this->connections[EAST] = FIELD;
+            this->connections[SOUTH] = CASTLE;
+            this->connections[WEST] = FIELD;
             break;
         case CASTLE_CORNER_WALL:
-            this->north = CASTLE;
-            this->east = FIELD;
-            this->south = FIELD;
-            this->west = CASTLE;
+            this->connections[NORTH] = CASTLE;
+            this->connections[EAST] = FIELD;
+            this->connections[SOUTH] = FIELD;
+            this->connections[WEST] = CASTLE;
             break;
         case CASTLE_CORNER_WALL_ROAD_BY:
-            this->north = CASTLE;
-            this->east = ROAD;
-            this->south = ROAD;
-            this->west = CASTLE;
+            this->connections[NORTH] = CASTLE;
+            this->connections[EAST] = ROAD;
+            this->connections[SOUTH] = ROAD;
+            this->connections[WEST] = CASTLE;
             break;
         case CASTLE_CAP_WALL:
-            this->north = CASTLE;
-            this->east = FIELD;
-            this->south = FIELD;
-            this->west = FIELD;
+            this->connections[NORTH] = CASTLE;
+            this->connections[EAST] = FIELD;
+            this->connections[SOUTH] = FIELD;
+            this->connections[WEST] = FIELD;
             break;
         case CASTLE_CAP_WALL_ROAD_TO:
-            this->north = CASTLE;
-            this->east = FIELD;
-            this->south = ROAD;
-            this->west = FIELD;
+            this->connections[NORTH] = CASTLE;
+            this->connections[EAST] = FIELD;
+            this->connections[SOUTH] = ROAD;
+            this->connections[WEST] = FIELD;
             break;
         case CASTLE_CAP_WALL_ROAD_BY:
-            this->north = CASTLE;
-            this->east = ROAD;
-            this->south = FIELD;
-            this->west = ROAD;
+            this->connections[NORTH] = CASTLE;
+            this->connections[EAST] = ROAD;
+            this->connections[SOUTH] = FIELD;
+            this->connections[WEST] = ROAD;
             break;
         case CASTLE_SHIRT_WALL:
-            this->north = CASTLE;
-            this->east = CASTLE;
-            this->south = FIELD;
-            this->west = CASTLE;
+            this->connections[NORTH] = CASTLE;
+            this->connections[EAST] = CASTLE;
+            this->connections[SOUTH] = FIELD;
+            this->connections[WEST] = CASTLE;
             break;
         case CASTLE_SHIRT_WALL_ROAD_TO:
-            this->north = CASTLE;
-            this->east = CASTLE;
-            this->south = ROAD;
-            this->west = CASTLE;
+            this->connections[NORTH] = CASTLE;
+            this->connections[EAST] = CASTLE;
+            this->connections[SOUTH] = ROAD;
+            this->connections[WEST] = CASTLE;
             break;
         case EMPTY:
         default:
-            this->north = NONE;
-            this->east = NONE;
-            this->south = NONE;
-            this->west = NONE;
+            this->connections[NORTH] = NONE;
+            this->connections[EAST] = NONE;
+            this->connections[SOUTH] = NONE;
+            this->connections[WEST] = NONE;
             break;
     }
 
