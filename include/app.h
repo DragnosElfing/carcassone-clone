@@ -1,12 +1,12 @@
 #ifndef CRCLONE_APP_H
 #define CRCLONE_APP_H
 
-#include <SDL2/SDL_render.h>
-#include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
+#include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL.h>
-#include "tile.h"
-#include "player.h"
+
+#include "game/tile.h"
+#include "game/player.h"
 #include "ui.h"
 
 #define FPS 60
@@ -37,6 +37,7 @@ typedef struct
     SDL_Texture* splash_title;
     SDL_Renderer* renderer;
     TTF_Font* default_font;
+    TTF_Font* small_font;
 } Carcassone;
 Carcassone* Carcassone__construct(int, int, char const*);
 void Carcassone__destroy(Carcassone*);
@@ -44,6 +45,8 @@ void Carcassone__Menu__construct(Carcassone*);
 void Carcassone__Menu__destroy(Carcassone*);
 void Carcassone__Lboard__construct(Carcassone*);
 void Carcassone__Lboard__destroy(Carcassone*);
+void Carcassone__Game__construct(Carcassone*);
+void Carcassone__Game__destroy(Carcassone*);
 void Carcassone__run(Carcassone*);
 void Carcassone__Menu__render(Carcassone*);
 void Carcassone__Game__render(Carcassone*);
@@ -60,6 +63,16 @@ void Carcassone__init_counter(Carcassone*);
 void Carcassone__move_board(Carcassone*, SDL_KeyCode);
 void Carcassone__draw_new(Carcassone*);
 bool Carcassone__check_surrounding_tiles(Carcassone*, SDL_Point);
+Button Carcassone__Button__construct(Carcassone*, char*, SDL_Rect, SDL_Color, SDL_Color);
+bool Carcassone__Button__hover(Carcassone*, Button*, SDL_Point);
+void Carcassone__Button__render(Carcassone*, Button*);
+void Carcassone__Button__destroy(Carcassone*, Button*);
+Prompt Carcassone__Prompt__construct(Carcassone*, char*, bool, SDL_Rect, SDL_Color, SDL_Color);
+void Carcassone__Prompt__edit(Carcassone*, Prompt*, char*);
+void Carcassone__Prompt__render(Carcassone*, Prompt*);
+void Carcassone__Prompt__toggle_focus(Carcassone*, Prompt*);
+void Carcassone__Prompt__destroy(Carcassone*, Prompt*);
 
+static void Carcassone__render_text_to(Carcassone*, SDL_Texture*, char const*);
 
 #endif

@@ -1,5 +1,7 @@
 *.docx
 *.make
+*.log
+*.o
 .vscode/
 .idea/
 bin/

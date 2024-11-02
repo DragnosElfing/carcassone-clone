@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <SDL2/SDL.h>
-#include "tile.h"
+#include "game/tile.h"
 
 typedef struct {
     unsigned int x, y;
@@ -11,7 +11,7 @@ typedef struct {
     SDL_Texture* texture;
     bool is_placed;
 } Meeple;
-Meeple Meeple__construct();
+Meeple Meeple__construct(SDL_Renderer*);
 void Meeple__place_on(Meeple*, unsigned int, unsigned int);
 void Meeple__reclaim(Meeple*);
 void Meeple__destroy(Meeple*);

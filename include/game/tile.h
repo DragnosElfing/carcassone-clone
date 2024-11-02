@@ -10,9 +10,9 @@
 
 typedef enum {
     NONE = 0U,
-    CASTLE,
+    FIELD,
     ROAD,
-    FIELD
+    CASTLE
 } ConnectionType;
 
 typedef enum {

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "player.h"
+#include "game/player.h"
 
 Leaderboard* Leaderboard__construct(char const* records_file_path)
 {

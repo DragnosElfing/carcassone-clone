@@ -3,15 +3,18 @@
 
 #include <stdbool.h>
 #include <SDL2/SDL.h>
-#include "tile.h"
-#include "player.h"
+#include <SDL2/SDL_ttf.h>
+
+#include "game/tile.h"
+#include "game/player.h"
 
 #define PILE_SIZE 71
 #define BOARD_SIZE 10
 
 typedef struct
 {
-    SDL_Rect rect;
+    SDL_Rect rect, global_rect;
+    SDL_Color bg_color;
     char* label;
     SDL_Texture* label_texture;
 } Button;
@@ -39,6 +42,7 @@ typedef struct
 
 typedef struct
 {
+    bool is_ready;
     SDL_Point map_offset;
     Tile** board;
     Tile* drawn_tile;
@@ -46,6 +50,7 @@ typedef struct
     size_t pile_index;
     Player players[2];
     Prompt player_name_inputs[2];
+    Button ready_button;
     Player* curr_player;
     SDL_Texture* pile_counter[PILE_SIZE];
     TilesetWrapper tileset_wrapper;

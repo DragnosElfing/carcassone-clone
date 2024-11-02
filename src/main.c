@@ -1,3 +1,7 @@
+#ifdef _CRCLONE_DEBUG
+    #include "debug/debugmalloc.h"
+#endif
+
 #include "app.h"
 
 /**

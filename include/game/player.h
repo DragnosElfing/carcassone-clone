@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
-#include "meeple.h"
+#include "game/meeple.h"
 
 #define MAX_MEEPLES 7
 
@@ -22,9 +22,9 @@ typedef struct {
     SDL_Texture* turn_indicator;
     SDL_Texture* stat_panel;
 } Player;
-Player* Player__construct(char*, unsigned int);
+Player* Player__construct(SDL_Renderer*, char*, unsigned int);
 void Player__toggle_turn_active(Player*);
-void Player__update_score(Player*);
+void Player__update_score(Player*, unsigned int);
 void Player__destroy(Player*);
 
 typedef struct {

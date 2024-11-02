@@ -1,5 +1,6 @@
-#include "math.h"
-#include "tile.h"
+#include <math.h>
+#include "app.h"
+#include "game/tile.h"
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_log.h>
 #include <SDL2/SDL_render.h>
@@ -36,11 +37,22 @@ void Tile__set_rotation(Tile* this, unsigned short new_rotation)
 {
     if(!this->rotatable) return;
 
+    ConnectionType prev_connections[4];
+
+    // TODO: no
     new_rotation %= 360;
-    unsigned int rotations_needed = abs(new_rotation - this->rotation) / 90;
-    ConnectionType* prev_connections = this->connections;
-    for(unsigned int dir = NORTH; dir <= WEST; ++dir) {
-        this->connections[dir] = prev_connections[(dir + rotations_needed) % 4];
+    unsigned int r = this->rotation;
+    while(r != new_rotation) {
+        r += 90;
+        r %= 360;
+
+        for(unsigned int dir = NORTH; dir <= WEST; ++dir) {
+            prev_connections[dir] = this->connections[dir];
+        }
+        for(int dir = NORTH; dir <= WEST; ++dir) {
+            this->connections[dir] = (dir - 1) < 0 ? prev_connections[3] : prev_connections[dir - 1];
+        }
+        
     }
 
     this->rotation = new_rotation;

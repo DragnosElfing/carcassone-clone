@@ -1,6 +1,6 @@
 #include <SDL2/SDL.h>
 
-#include "tile.h"
+#include "game/tile.h"
 
 TilesetWrapper TilesetWrapper__construct(SDL_Renderer* renderer)
 {
