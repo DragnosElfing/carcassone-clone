@@ -1,5 +1,6 @@
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_keyboard.h>
+#include <SDL2/SDL_keycode.h>
 #include <SDL2/SDL_render.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,16 +15,14 @@
 #include "app.h"
 
 /**
- * @brief Initializes all the struct members, SDL and TTF contexts.
+ * @brief Initicializálja az összes nézetet, SDL és TTF kontextusokat.
  *
- * Long description.
- * Bruh.
- * Must call Carcassone__destroy(Carcassone*) to properly release allocated memory.
+ * Megjegyzés: A lefoglalt memória megfelelő felszabadításához meg kell hívni a Carcassone__destroy(Carcassone*) függvényt.
  *
- * @param width Width of the SDL window.
- * @param height Height of the SDL window.
- * @param title Title of the SDL window.
- * @return A pointer to the new, dynamically created Carcassone struct.
+ * @param width Az ablak szélessége.
+ * @param height Az ablak magassága.
+ * @param title Az ablak címe.
+ * @return Pointer az újonnan létrehozott Carcassone structra.
  */
 Carcassone* Carcassone__construct(int width, int height, char const* title)
 {
@@ -49,7 +48,7 @@ Carcassone* Carcassone__construct(int width, int height, char const* title)
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "%s", SDL_GetError());
         return NULL;
     }
-    //return NULL; // ? why segfault
+
     new_app->window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     if(new_app->window == NULL) {
@@ -100,6 +99,11 @@ Carcassone* Carcassone__construct(int width, int height, char const* title)
     return new_app;
 }
 
+/**
+ * @brief Minden a megadott Carcassone struct által lefoglalt memóriát felszabadít.
+ *
+ * @param this A Carcassone struct aminek a lefoglalt memóriáját fel kell szabadítani.
+ */
 void Carcassone__destroy(Carcassone* this)
 {
     this->is_running = false;
@@ -125,11 +129,6 @@ void Carcassone__handle_input(Carcassone* this)
     SDL_Event event;
     SDL_PollEvent(&event);
 
-    // if(this->state == GAME && !this->game_screen->is_ready) {
-    //     SDL_StartTextInput();
-    //     //DBG_LOG("TEXT INPUT ACTIVE");
-    // }
-
     switch(event.type) {
         case SDL_QUIT:
             this->is_running = false;
@@ -140,11 +139,11 @@ void Carcassone__handle_input(Carcassone* this)
 
             if(this->game_screen->player_name_inputs[0].is_active) {
                 if(strlen(this->game_screen->player_name_inputs[0].prompt.label) < 24) {
-                    Carcassone__Prompt__edit(this, &this->game_screen->player_name_inputs[0], event.text.text);
+                    Carcassone__Prompt__edit(this, &this->game_screen->player_name_inputs[0], event.text.text, true);
                 }
             } else if(this->game_screen->player_name_inputs[1].is_active){
                 if(strlen(this->game_screen->player_name_inputs[1].prompt.label) < 24) {
-                    Carcassone__Prompt__edit(this, &this->game_screen->player_name_inputs[1], event.text.text);
+                    Carcassone__Prompt__edit(this, &this->game_screen->player_name_inputs[1], event.text.text, true);
                 }
             }
             break;
@@ -155,6 +154,20 @@ void Carcassone__handle_input(Carcassone* this)
             switch(event.key.keysym.sym) {
                 case SDLK_ESCAPE:
                     this->is_running = false;
+                    break;
+                case SDLK_BACKSPACE:
+                    // TODO: ABSOLUTELY NOT, and handle utf8 characters
+                    if(this->game_screen->player_name_inputs[0].is_active) {
+                        if(strlen(this->game_screen->player_name_inputs[0].prompt.label) > 0) {
+                            this->game_screen->player_name_inputs[0].prompt.label[strlen(this->game_screen->player_name_inputs[0].prompt.label)-1] = '\0';
+                            Carcassone__Prompt__edit(this, &this->game_screen->player_name_inputs[0], this->game_screen->player_name_inputs[0].prompt.label, false);
+                        }
+                    } else if(this->game_screen->player_name_inputs[1].is_active){
+                        if(strlen(this->game_screen->player_name_inputs[1].prompt.label) > 0) {
+                            this->game_screen->player_name_inputs[1].prompt.label[strlen(this->game_screen->player_name_inputs[1].prompt.label)-1] = '\0';
+                            Carcassone__Prompt__edit(this, &this->game_screen->player_name_inputs[1], this->game_screen->player_name_inputs[1].prompt.label, false);
+                        }
+                    }
                     break;
                 case SDLK_d:
                     if(this->game_screen->is_ready) Carcassone__draw_new(this);
@@ -188,9 +201,11 @@ void Carcassone__handle_input(Carcassone* this)
             if(this->state != GAME) break;
 
             if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->game_screen->player_name_inputs[0].prompt.global_rect)) {
+                if(this->game_screen->player_name_inputs[0].is_active) break;
                 Carcassone__Prompt__toggle_focus(this, &this->game_screen->player_name_inputs[0]);
                 Carcassone__Prompt__toggle_focus(this, &this->game_screen->player_name_inputs[1]);
             } else if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->game_screen->player_name_inputs[1].prompt.global_rect)) {
+                if(this->game_screen->player_name_inputs[1].is_active) break;
                 Carcassone__Prompt__toggle_focus(this, &this->game_screen->player_name_inputs[1]);
                 Carcassone__Prompt__toggle_focus(this, &this->game_screen->player_name_inputs[0]);
             }
@@ -226,11 +241,17 @@ void Carcassone__handle_input(Carcassone* this)
 
 void Carcassone__init_players(Carcassone* this)
 {
-    
+    this->game_screen->players[0] = Player__construct(this->renderer, 
+            this->game_screen->player_name_inputs[0].prompt.label, 
+            Leaderboard__get_highscore_for(this->lboard_screen->leaderboard, this->game_screen->player_name_inputs[0].prompt.label)); // TODO: NO
+    this->game_screen->players[1] = Player__construct(this->renderer, 
+            this->game_screen->player_name_inputs[1].prompt.label, 
+            Leaderboard__get_highscore_for(this->lboard_screen->leaderboard, this->game_screen->player_name_inputs[1].prompt.label)); // TODO: NO
 }
 
 void Carcassone__init_pile(Carcassone* this)
 {
+    // TODO: put this in a config file
     TileType pile[PILE_SIZE] = {
         FIELD_CLOISTER_ROAD_S, FIELD_CLOISTER_ROAD_S,
         FIELD_CLOISTER_ROAD_S, FIELD_CLOISTER_ROAD_S,

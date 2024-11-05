@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['grid_5fsize_0',['GRID_SIZE',['../app_8h.html#a08246606c233e7785a497c09672f366f',1,'app.h']]]
+  ['fps_0',['FPS',['../app_8h.html#ac92ca5ab87034a348decad7ee8d4bd1b',1,'app.h']]]
 ];

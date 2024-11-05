@@ -1,9 +1,11 @@
 var searchData=
 [
-  ['back_5fbutton_0',['back_button',['../structLboard.html#a2d17ca25c30727aab9b049593e2b91f7',1,'Lboard']]],
-  ['background_1',['background',['../structMenu.html#a5674b9761f1cf4d1db207df0c27b6ae0',1,'Menu']]],
-  ['board_2',['board',['../structCarcassone.html#a5546ca7cb17a870a3330edb8656147fd',1,'Carcassone']]],
-  ['board_5ftexture_3',['board_texture',['../structCarcassone.html#abc5d35654235b3a9e8a0bb6661c6cbdd',1,'Carcassone']]],
-  ['button_4',['Button',['../structButton.html',1,'']]],
-  ['button_5fcontainer_5',['button_container',['../structMenu.html#abdf3f630707d70f9f323a896aad0361b',1,'Menu']]]
+  ['back_5fbutton_0',['back_button',['../structLeaderboardScreen.html#a8f3596e44e16ec79ce66f80f973d75de',1,'LeaderboardScreen']]],
+  ['background_1',['background',['../structMenuScreen.html#a8c987c1b277ede196fcc1c31927669c0',1,'MenuScreen']]],
+  ['bg_5fcolor_2',['bg_color',['../structButton.html#a55fd5e18b2b89ae80e8be641da1d7472',1,'Button']]],
+  ['board_3',['board',['../structGameScreen.html#a5d9f4b5b3967580c036d21bb150ee9ae',1,'GameScreen']]],
+  ['board_5fsize_4',['BOARD_SIZE',['../ui_8h.html#a1db39eb31d1315ce982608fe25587b6d',1,'ui.h']]],
+  ['board_5ftexture_5',['board_texture',['../structGameScreen.html#a460da64ab88708b24dbedc3af02637c0',1,'GameScreen']]],
+  ['button_6',['Button',['../structButton.html',1,'']]],
+  ['button_5fcontainer_7',['button_container',['../structMenuScreen.html#a5a18d1dab316cde8fa6c9efbb89f8c17',1,'MenuScreen']]]
 ];

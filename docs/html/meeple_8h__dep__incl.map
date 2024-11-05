@@ -1,10 +1,13 @@
-<map id="include/meeple.h" name="include/meeple.h">
-<area shape="rect" id="node1" title=" " alt="" coords="101,5,221,32"/>
-<area shape="rect" id="node2" href="$tile_8h.html" title=" " alt="" coords="113,80,208,107"/>
-<area shape="rect" id="node3" href="$app_8h.html" title=" " alt="" coords="81,229,179,256"/>
+<map id="include/game/meeple.h" name="include/game/meeple.h">
+<area shape="rect" id="node1" title=" " alt="" coords="313,5,469,32"/>
+<area shape="rect" id="node2" href="$player_8h.html" title=" " alt="" coords="261,80,409,107"/>
+<area shape="rect" id="node11" href="$players_8c.html" title=" " alt="" coords="475,155,572,181"/>
+<area shape="rect" id="node3" href="$app_8h.html" title=" " alt="" coords="199,229,298,256"/>
 <area shape="rect" id="node4" href="$app_8c.html" title=" " alt="" coords="5,304,81,331"/>
-<area shape="rect" id="node6" href="$textures_8h.html" title=" " alt="" coords="149,155,274,181"/>
-<area shape="rect" id="node8" href="$tile_8c.html" title=" " alt="" coords="298,155,370,181"/>
-<area shape="rect" id="node5" href="$main_8c.html" title=" " alt="" coords="106,304,189,331"/>
-<area shape="rect" id="node7" href="$textures_8c.html" title=" " alt="" coords="204,229,307,256"/>
+<area shape="rect" id="node6" href="$screens_8c.html" title=" " alt="" coords="399,304,501,331"/>
+<area shape="rect" id="node9" href="$ui_8h.html" title=" " alt="" coords="291,155,379,181"/>
+<area shape="rect" id="node10" href="$leaderboard_8c.html" title=" " alt="" coords="94,155,217,181"/>
+<area shape="rect" id="node5" href="$main_8c.html" title=" " alt="" coords="202,304,285,331"/>
+<area shape="rect" id="node7" href="$tile_8c.html" title=" " alt="" coords="106,304,178,331"/>
+<area shape="rect" id="node8" href="$ui_8c.html" title=" " alt="" coords="309,304,375,331"/>
 </map>

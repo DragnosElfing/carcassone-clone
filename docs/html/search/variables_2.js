@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['default_5ffont_0',['default_font',['../structCarcassone.html#affa118348eb72a2fcb3edb6be34f6419',1,'Carcassone']]],
-  ['drawn_5ftile_1',['drawn_tile',['../structCarcassone.html#ae8ecccf717ffbf34e5eed2989dd56d39',1,'Carcassone']]]
+  ['card_5fpile_0',['card_pile',['../structGameScreen.html#a25fe0a876f839b0ec53629a69d19c408',1,'GameScreen']]],
+  ['connections_1',['connections',['../structTile.html#a7c5525156ab6735922b30164be48e118',1,'Tile']]],
+  ['curr_5fplayer_2',['curr_player',['../structGameScreen.html#ad1d661d4ddd32210bb80f9c236e8b3eb',1,'GameScreen']]]
 ];

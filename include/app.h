@@ -68,7 +68,7 @@ bool Carcassone__Button__hover(Carcassone*, Button*, SDL_Point);
 void Carcassone__Button__render(Carcassone*, Button*);
 void Carcassone__Button__destroy(Carcassone*, Button*);
 Prompt Carcassone__Prompt__construct(Carcassone*, char*, bool, SDL_Rect, SDL_Color, SDL_Color);
-void Carcassone__Prompt__edit(Carcassone*, Prompt*, char*);
+void Carcassone__Prompt__edit(Carcassone*, Prompt*, char*, bool);
 void Carcassone__Prompt__render(Carcassone*, Prompt*);
 void Carcassone__Prompt__toggle_focus(Carcassone*, Prompt*);
 void Carcassone__Prompt__destroy(Carcassone*, Prompt*);

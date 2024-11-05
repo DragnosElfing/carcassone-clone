@@ -53,5 +53,9 @@ project "CarcassoneClone"
     filter "configurations:Release"
         optimize "On"
 
+        postbuildcommands {
+            "doxygen dconfig"
+        }
+
         warnings "Off"
         externalwarnings "Off"

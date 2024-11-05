@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['lboard_0',['LBOARD',['../app_8h.html#a83fc559664fc7c7e310c93586457b428acda53abac3eb3fc4d9ffa49322849ae0',1,'app.h']]]
+  ['leaderboard_0',['LEADERBOARD',['../app_8h.html#a83fc559664fc7c7e310c93586457b428a8ac6a0bc60a7a5faad394dc988be36eb',1,'app.h']]]
 ];

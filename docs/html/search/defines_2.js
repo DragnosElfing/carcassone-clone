@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['fps_0',['FPS',['../app_8h.html#ac92ca5ab87034a348decad7ee8d4bd1b',1,'app.h']]]
+  ['dbg_5flog_0',['DBG_LOG',['../app_8h.html#a7207f8595835b4190f3f2908998f6334',1,'app.h']]]
 ];

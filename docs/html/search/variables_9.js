@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['name_0',['name',['../structStat.html#a629b10dd7fa081b0e4b4b9c1b3136a15',1,'Stat']]],
-  ['north_1',['north',['../structTile.html#a6c734a14bc238f86093e93a14bc3dfbb',1,'Tile']]]
+  ['map_5foffset_0',['map_offset',['../structGameScreen.html#a2fcab7ee0c6d88d57099a877fea41856',1,'GameScreen']]],
+  ['meeples_1',['meeples',['../structPlayer.html#a21cff49338d8075f68e4d366c36231aa',1,'Player']]],
+  ['menu_5fscreen_2',['menu_screen',['../structCarcassone.html#ad697fef287985b2003e79bd7a01f10dd',1,'Carcassone']]]
 ];

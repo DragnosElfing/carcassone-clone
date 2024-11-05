@@ -29,15 +29,15 @@ void Meeple__destroy(Meeple* this)
     if(this->texture != NULL) SDL_DestroyTexture(this->texture);
 }
 
-Player* Player__construct(SDL_Renderer* renderer, char* name, unsigned int highscore)
+Player Player__construct(SDL_Renderer* renderer, char const* name, unsigned int highscore)
 {
-    Player* new_player = malloc(sizeof(Player));
-
-    strcpy(new_player->name, strlen(name) <= 24 ? name : "INVALID");
-    new_player->highscore = highscore;
-    new_player->score = 0U;
+    Player new_player = {
+        .highscore = highscore,
+        .score = 0U
+    };
+    strcpy(new_player.name, strlen(name) <= 24 ? name : "INVALID");
     for(size_t m = 0U; m < MAX_MEEPLES; ++m) {
-        new_player->meeples[m] = Meeple__construct(renderer);
+        new_player.meeples[m] = Meeple__construct(renderer);
     }
 
     return new_player;

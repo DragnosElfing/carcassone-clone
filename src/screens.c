@@ -154,7 +154,6 @@ void Carcassone__Game__construct(Carcassone* this)
 
     this->game_screen->board_texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888,
         SDL_TEXTUREACCESS_TARGET, 600, this->height - this->game_screen->map_offset.y - 10);
-    Carcassone__init_players(this);
     this->game_screen->tileset_wrapper = TilesetWrapper__construct(this->renderer);
     if(this->game_screen->tileset_wrapper.tile_set == NULL) {
         SDL_LogError(SDL_LOG_CATEGORY_RENDER, "Nem lehetett betölteni az atlaszt!");

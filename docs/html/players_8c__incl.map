@@ -1,0 +1,12 @@
+<map id="src/players.c" name="src/players.c">
+<area shape="rect" id="node1" title=" " alt="" coords="291,5,389,32"/>
+<area shape="rect" id="node2" href="$player_8h.html" title=" " alt="" coords="199,80,302,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,155,144,181"/>
+<area shape="rect" id="node7" href="$meeple_8h.html" title=" " alt="" coords="307,155,418,181"/>
+<area shape="rect" id="node9" title=" " alt="" coords="377,80,524,107"/>
+<area shape="rect" id="node10" title=" " alt="" coords="549,80,614,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="219,155,283,181"/>
+<area shape="rect" id="node5" title=" " alt="" coords="368,304,443,331"/>
+<area shape="rect" id="node6" title=" " alt="" coords="195,304,291,331"/>
+<area shape="rect" id="node8" href="$tile_8h.html" title=" " alt="" coords="281,229,367,256"/>
+</map>

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['player_0',['Player',['../structPlayer.html',1,'']]]
+  ['meeple_0',['Meeple',['../structMeeple.html',1,'']]],
+  ['menuscreen_1',['MenuScreen',['../structMenuScreen.html',1,'']]]
 ];

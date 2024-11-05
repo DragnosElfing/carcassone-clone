@@ -1,8 +1,6 @@
 var dir_d44c64559bbebec7f509842c48db8b23 =
 [
+    [ "game", "dir_f307a46daed1218fee22380d1eacedba.html", "dir_f307a46daed1218fee22380d1eacedba" ],
     [ "app.h", "app_8h.html", "app_8h" ],
-    [ "meeple.h", "meeple_8h.html", "meeple_8h" ],
-    [ "player.h", "player_8h.html", "player_8h" ],
-    [ "textures.h", "textures_8h.html", "textures_8h" ],
-    [ "tile.h", "tile_8h.html", "tile_8h" ]
+    [ "ui.h", "ui_8h.html", "ui_8h" ]
 ];

@@ -1,4 +1,4 @@
 <map id="Leaderboard" name="Leaderboard">
-<area shape="rect" id="node1" title=" " alt="" coords="5,95,99,121"/>
-<area shape="rect" id="node2" href="$structStat.html" title=" " alt="" coords="29,5,75,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="21,95,114,121"/>
+<area shape="rect" id="node2" href="$structLeaderboardEntry.html" title=" " alt="" coords="5,5,129,32"/>
 </map>

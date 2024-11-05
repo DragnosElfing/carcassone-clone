@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['tiletype_5fsize_5f_5f_0',['TILETYPE_SIZE__',['../tile_8h.html#ac9e486ec80ccfdb28a4f4837d419c9f1a37e4a23970ad5feaafc00e4de7b98553',1,'tile.h']]]
+  ['south_0',['SOUTH',['../tile_8h.html#a0fde1ff3d073cb77237ea08eea64d963a8ef5c0bce69283a9986011a63eea8a6b',1,'tile.h']]]
 ];

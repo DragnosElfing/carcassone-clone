@@ -1,13 +1,13 @@
 var indexSectionsWithContent =
 {
-  0: "abcdefghilmnoprstw",
-  1: "bclmpst",
-  2: "almpt",
-  3: "clmt",
-  4: "bcdeghilmnoprstw",
+  0: "abcdefghilmnprstuwxy",
+  1: "bcglmpt",
+  2: "almpstu",
+  3: "clmpt",
+  4: "abcdeghilmnprstwxy",
   5: "act",
-  6: "cefglmnrt",
-  7: "cdfgmpt"
+  6: "cefglmnrstw",
+  7: "bcdfmpt"
 };
 
 var indexSectionNames =
@@ -24,13 +24,13 @@ var indexSectionNames =
 
 var indexSectionLabels =
 {
-  0: "All",
-  1: "Data Structures",
-  2: "Files",
-  3: "Functions",
-  4: "Variables",
-  5: "Enumerations",
-  6: "Enumerator",
-  7: "Macros"
+  0: "Összes",
+  1: "Adatszerkezetek",
+  2: "Fájlok",
+  3: "Függvények",
+  4: "Változók",
+  5: "Enumerációk",
+  6: "Enumeráció-értékek",
+  7: "Makródefiníciók"
 };
 

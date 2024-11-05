@@ -22,7 +22,7 @@ typedef struct {
     SDL_Texture* turn_indicator;
     SDL_Texture* stat_panel;
 } Player;
-Player* Player__construct(SDL_Renderer*, char*, unsigned int);
+Player Player__construct(SDL_Renderer*, char const*, unsigned int);
 void Player__toggle_turn_active(Player*);
 void Player__update_score(Player*, unsigned int);
 void Player__destroy(Player*);
@@ -39,6 +39,6 @@ typedef struct {
 Leaderboard* Leaderboard__construct(char const*);
 void Leaderboard__destroy(Leaderboard*);
 void Leaderboard__sort(Leaderboard*);
-unsigned int Leaderboard__get_highscore_for(Leaderboard*, Player*);
+unsigned int Leaderboard__get_highscore_for(Leaderboard*, char const*);
 
 #endif

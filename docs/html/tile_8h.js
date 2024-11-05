@@ -1,13 +1,20 @@
 var tile_8h =
 [
     [ "Tile", "structTile.html", "structTile" ],
+    [ "TilesetWrapper", "structTilesetWrapper.html", "structTilesetWrapper" ],
     [ "TILE_SIZE", "tile_8h.html#a62ecd70800687eb2d625af180c4210d7", null ],
     [ "TILE_SIZE_SRC", "tile_8h.html#a8d44ad1dd48f73d938052a5e2bcfaa49", null ],
+    [ "ConnectionDirection", "tile_8h.html#a0fde1ff3d073cb77237ea08eea64d963", [
+      [ "NORTH", "tile_8h.html#a0fde1ff3d073cb77237ea08eea64d963ad0611de6f28d4a9c9eac959f5344698e", null ],
+      [ "EAST", "tile_8h.html#a0fde1ff3d073cb77237ea08eea64d963ab5b3793b961949c817c7c0d99c05dad7", null ],
+      [ "SOUTH", "tile_8h.html#a0fde1ff3d073cb77237ea08eea64d963a8ef5c0bce69283a9986011a63eea8a6b", null ],
+      [ "WEST", "tile_8h.html#a0fde1ff3d073cb77237ea08eea64d963ae9449e8683a8199dad36b07a63b2f523", null ]
+    ] ],
     [ "ConnectionType", "tile_8h.html#aa1f0e2efd52935fd01bfece0fbead81f", [
       [ "NONE", "tile_8h.html#aa1f0e2efd52935fd01bfece0fbead81fac157bdf0b85a40d2619cbc8bc1ae5fe2", null ],
-      [ "CASTLE", "tile_8h.html#aa1f0e2efd52935fd01bfece0fbead81fabd1c3204d9046c798b90b1b25bd9d8f1", null ],
+      [ "FIELD", "tile_8h.html#aa1f0e2efd52935fd01bfece0fbead81fad204836f74ffdd8c40784e385d04e88d", null ],
       [ "ROAD", "tile_8h.html#aa1f0e2efd52935fd01bfece0fbead81faa57edeeb1dd2c77d5b8afca80b14e9aa", null ],
-      [ "FIELD", "tile_8h.html#aa1f0e2efd52935fd01bfece0fbead81fad204836f74ffdd8c40784e385d04e88d", null ]
+      [ "CASTLE", "tile_8h.html#aa1f0e2efd52935fd01bfece0fbead81fabd1c3204d9046c798b90b1b25bd9d8f1", null ]
     ] ],
     [ "TileType", "tile_8h.html#ac9e486ec80ccfdb28a4f4837d419c9f1", [
       [ "EMPTY", "tile_8h.html#ac9e486ec80ccfdb28a4f4837d419c9f1a2f0d18fc0d0fa4a6cd92dc328501874d", null ],
@@ -31,10 +38,13 @@ var tile_8h =
       [ "CASTLE_SHIRT_WALL_ROAD_TO", "tile_8h.html#ac9e486ec80ccfdb28a4f4837d419c9f1ad0e682d5c75264d6017e82fa0e1b8327", null ],
       [ "TILETYPE_SIZE__", "tile_8h.html#ac9e486ec80ccfdb28a4f4837d419c9f1a37e4a23970ad5feaafc00e4de7b98553", null ]
     ] ],
-    [ "Tile__change_type", "tile_8h.html#a7b08be0d031dfbccdff05dbe1af4a8a5", null ],
     [ "Tile__construct", "tile_8h.html#a8e4fe7c7a3dba0cd111e7fe5993af915", null ],
     [ "Tile__move_by", "tile_8h.html#abf65d54c08c64294f242ce7e6610a8e6", null ],
     [ "Tile__point_in_tile", "tile_8h.html#aecac784a6ed1f242ba52b0ce43434ef9", null ],
     [ "Tile__rotate", "tile_8h.html#abc03a699cb8b13d75d32e8331b6641e4", null ],
-    [ "Tile__set_rotation", "tile_8h.html#afa51c27600c5784c59a5c5ed4e676e5a", null ]
+    [ "Tile__set_rotation", "tile_8h.html#a132d14189f57de3863656fcc3dd6cec8", null ],
+    [ "Tile__set_type", "tile_8h.html#a07bd462be614bbc16d70aa75c3a6d22f", null ],
+    [ "TilesetWrapper__construct", "tile_8h.html#a19c92302ee8dbe46ff434c64adf18e74", null ],
+    [ "TilesetWrapper__destroy", "tile_8h.html#a4c900b23b7b8b582d63296ee9314ade0", null ],
+    [ "TilesetWrapper__get_texture_rect_for", "tile_8h.html#a99ec42ab4d9a32752246785f268216ad", null ]
 ];

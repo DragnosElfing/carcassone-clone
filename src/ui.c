@@ -46,7 +46,7 @@ void Carcassone__Button__destroy(Carcassone* this, Button* button)
 
 Prompt Carcassone__Prompt__construct(Carcassone* this, char* default_label, bool autofocus, SDL_Rect global_rect, SDL_Color bg_color, SDL_Color text_color)
 {
-    char* label = malloc(24 * sizeof(char));
+    char* label = malloc((24+1) * sizeof(char));
     for(size_t i = 0U; i <= strlen(default_label); ++i) {
         label[i] = default_label[i];
     }
@@ -58,9 +58,15 @@ Prompt Carcassone__Prompt__construct(Carcassone* this, char* default_label, bool
     return new_prompt;
 }
 
-void Carcassone__Prompt__edit(Carcassone* this, Prompt* prompt, char* new_label)
-{
-    strcat(prompt->prompt.label, new_label);
+void Carcassone__Prompt__edit(Carcassone* this, Prompt* prompt, char* new_label, bool concat)
+{   
+    if(concat) {
+        strcat(prompt->prompt.label, new_label);
+    } else {
+        strcpy(prompt->prompt.label, new_label);
+    }
+
+    if(prompt->prompt.label_texture != NULL) SDL_DestroyTexture(prompt->prompt.label_texture);
 
     SDL_Surface* updated_surface = TTF_RenderUTF8_Blended(this->default_font, prompt->prompt.label, (SDL_Color){0, 0, 0, 255});
     if(updated_surface != NULL) {

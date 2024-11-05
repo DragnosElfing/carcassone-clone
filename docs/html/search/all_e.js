@@ -1,12 +1,12 @@
 var searchData=
 [
-  ['rect_0',['rect',['../structButton.html#a6fcfa8e3d62cf1b78f5c4d5c9384b30d',1,'Button']]],
-  ['renderer_1',['renderer',['../structCarcassone.html#a9e0fbcfbe14dab5cdf13e71dab2418a5',1,'Carcassone']]],
-  ['road_2',['ROAD',['../tile_8h.html#aa1f0e2efd52935fd01bfece0fbead81faa57edeeb1dd2c77d5b8afca80b14e9aa',1,'tile.h']]],
-  ['road_5fns_3',['ROAD_NS',['../tile_8h.html#ac9e486ec80ccfdb28a4f4837d419c9f1a4e228b62f862896d7a84b6268c06a7f9',1,'tile.h']]],
-  ['road_5fnswe_4',['ROAD_NSWE',['../tile_8h.html#ac9e486ec80ccfdb28a4f4837d419c9f1a4556b2d8010714309b3a08ed503e1df0',1,'tile.h']]],
-  ['road_5fnw_5',['ROAD_NW',['../tile_8h.html#ac9e486ec80ccfdb28a4f4837d419c9f1aae6c4df48046796d4dd4ebea97af89ce',1,'tile.h']]],
-  ['road_5fnwe_6',['ROAD_NWE',['../tile_8h.html#ac9e486ec80ccfdb28a4f4837d419c9f1a83c466fe2a4218909ff1aff736cc38ab',1,'tile.h']]],
-  ['rotatable_7',['rotatable',['../structTile.html#a77941ec7a240535fb490d6477419597d',1,'Tile']]],
-  ['rotation_8',['rotation',['../structTile.html#a9780c1430238a027cc965a76c0481040',1,'Tile']]]
+  ['score_0',['score',['../structPlayer.html#a38a6dafe988a768a435cc0a9fde38e46',1,'Player']]],
+  ['score_5fcounter_1',['score_counter',['../structPlayer.html#adc760910d5cf5f69a706fd6f6ce3c341',1,'Player']]],
+  ['screens_2ec_2',['screens.c',['../screens_8c.html',1,'']]],
+  ['small_5ffont_3',['small_font',['../structCarcassone.html#a3ac3afea6ca2d0a046346ae17ffd1ab0',1,'Carcassone']]],
+  ['south_4',['SOUTH',['../tile_8h.html#a0fde1ff3d073cb77237ea08eea64d963a8ef5c0bce69283a9986011a63eea8a6b',1,'tile.h']]],
+  ['splash_5ftitle_5',['splash_title',['../structCarcassone.html#ac9ff55e30419e6f02bf4a0b5bf0db1a7',1,'Carcassone']]],
+  ['start_5fbutton_6',['start_button',['../structMenuScreen.html#af09bf6e1a68d856f34b6ff39362a333d',1,'MenuScreen']]],
+  ['stat_5fpanel_7',['stat_panel',['../structPlayer.html#a4a2cd9d9326251c850a195a48ff78f56',1,'Player']]],
+  ['state_8',['state',['../structCarcassone.html#ad428d476ec8f0a4dafdd8340db5e4170',1,'Carcassone']]]
 ];

@@ -50,6 +50,7 @@ typedef struct
     size_t pile_index;
     Player players[2];
     Prompt player_name_inputs[2];
+    Prompt* active_input;
     Button ready_button;
     Player* curr_player;
     SDL_Texture* pile_counter[PILE_SIZE];

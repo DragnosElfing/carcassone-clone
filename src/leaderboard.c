@@ -46,6 +46,17 @@ void Leaderboard__sort(Leaderboard* this)
     qsort(this->entries, this->entries_size, sizeof(LeaderboardEntry), entry_cmp);
 }
 
+unsigned int Leaderboard__get_highscore_for(Leaderboard* this, char const* name)
+{
+    for(size_t i = 0U; i < this->entries_size; ++i) {
+        if(strcmp(this->entries[i].name, name) == 0) {
+            return this->entries[i].highscore;
+        }
+    }
+
+    return 0U;
+}
+
 void Leaderboard__destroy(Leaderboard* this)
 {
     free(this->entries);

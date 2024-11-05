@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['dbg_5flog_0',['DBG_LOG',['../app_8h.html#a7207f8595835b4190f3f2908998f6334',1,'app.h']]]
+  ['color_5fblue_0',['COLOR_BLUE',['../app_8h.html#a23c70d699a5a775bc2e1ebeb8603f630',1,'app.h']]],
+  ['color_5fwhite_1',['COLOR_WHITE',['../app_8h.html#a9b44987ffdc2af19b635206b94334b69',1,'app.h']]]
 ];

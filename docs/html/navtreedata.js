@@ -25,21 +25,21 @@
 var NAVTREE =
 [
   [ "Carcassone Clone", "index.html", [
-    [ "Data Structures", "annotated.html", [
-      [ "Data Structures", "annotated.html", "annotated_dup" ],
-      [ "Data Fields", "functions.html", [
-        [ "All", "functions.html", null ],
-        [ "Variables", "functions_vars.html", null ]
+    [ "Adatszerkezetek", "annotated.html", [
+      [ "Adatszerkezetek", "annotated.html", "annotated_dup" ],
+      [ "Adatmezők", "functions.html", [
+        [ "Összes", "functions.html", null ],
+        [ "Változók", "functions_vars.html", null ]
       ] ]
     ] ],
-    [ "Files", "files.html", [
-      [ "File List", "files.html", "files_dup" ],
-      [ "Globals", "globals.html", [
-        [ "All", "globals.html", null ],
-        [ "Functions", "globals_func.html", null ],
-        [ "Enumerations", "globals_enum.html", null ],
-        [ "Enumerator", "globals_eval.html", null ],
-        [ "Macros", "globals_defs.html", null ]
+    [ "Fájlok", "files.html", [
+      [ "Fájllista", "files.html", "files_dup" ],
+      [ "Globális elemek", "globals.html", [
+        [ "Összes", "globals.html", null ],
+        [ "Függvények", "globals_func.html", null ],
+        [ "Enumerációk", "globals_enum.html", null ],
+        [ "Enumeráció-értékek", "globals_eval.html", null ],
+        [ "Makródefiníciók", "globals_defs.html", null ]
       ] ]
     ] ]
   ] ]
@@ -47,8 +47,9 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"annotated.html"
+"annotated.html",
+"tile_8h.html#ac9e486ec80ccfdb28a4f4837d419c9f1ad0e682d5c75264d6017e82fa0e1b8327"
 ];
 
-var SYNCONMSG = 'click to disable panel synchronisation';
-var SYNCOFFMSG = 'click to enable panel synchronisation';
+var SYNCONMSG = 'Kattintson a(z) letilt panel synchronisation';
+var SYNCOFFMSG = 'Kattintson a(z) engedélyez panel synchronisation';
