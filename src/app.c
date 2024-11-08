@@ -36,12 +36,6 @@ Carcassone* Carcassone__construct(int width, int height, char const* title)
     new_app->renderer = NULL;
     new_app->state = MENU;
 
-    #ifdef _CRCLONE_DEBUG
-        SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
-    #else
-        SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
-    #endif
-
     // Összes dolog betöltése
     if(SDL_Init(SDL_INIT_VIDEO) != 0 || TTF_Init() != 0) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "Nem sikerült inicializálni az SDL2-t!");
@@ -100,9 +94,9 @@ Carcassone* Carcassone__construct(int width, int height, char const* title)
 }
 
 /**
- * @brief Minden a megadott Carcassone struct által lefoglalt memóriát felszabadít.
+ * @brief Felszabadítja a megadott Carcassone struktúra által lefoglalt memóriát.
  *
- * @param this A Carcassone struct aminek a lefoglalt memóriáját fel kell szabadítani.
+ * @param this A Carcassone struktúra, aminek a lefoglalt memóriáját fel kell szabadítani.
  */
 void Carcassone__destroy(Carcassone* this)
 {
@@ -124,6 +118,13 @@ void Carcassone__destroy(Carcassone* this)
     free(this);
 }
 
+/**
+ * @brief Inputok kezelése.
+ * 
+ * SDL_Event-öket kezel.
+ *
+ * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
+ */
 void Carcassone__handle_input(Carcassone* this)
 {
     SDL_Event event;
@@ -161,6 +162,7 @@ void Carcassone__handle_input(Carcassone* this)
                         if(strlen(this->game_screen->player_name_inputs[0].prompt.label) > 0) {
                             this->game_screen->player_name_inputs[0].prompt.label[strlen(this->game_screen->player_name_inputs[0].prompt.label)-1] = '\0';
                             Carcassone__Prompt__edit(this, &this->game_screen->player_name_inputs[0], this->game_screen->player_name_inputs[0].prompt.label, false);
+                            DBG_LOG("%s", this->game_screen->player_name_inputs[0].prompt.label);
                         }
                     } else if(this->game_screen->player_name_inputs[1].is_active){
                         if(strlen(this->game_screen->player_name_inputs[1].prompt.label) > 0) {
@@ -239,7 +241,14 @@ void Carcassone__handle_input(Carcassone* this)
     }
 }
 
-void Carcassone__init_players(Carcassone* this)
+/**
+ * @brief Játákosok létrehozása.
+ * 
+ * Inicializálja a két játékost előre megadott adatok alapján (ezek a GameScreenben találhatók).
+ *
+ * @param this A Carcassone struktúra.
+ */
+void Carcassone__init_players(Carcassone* this) // TODO
 {
     this->game_screen->players[0] = Player__construct(this->renderer, 
             this->game_screen->player_name_inputs[0].prompt.label, 
@@ -249,9 +258,16 @@ void Carcassone__init_players(Carcassone* this)
             Leaderboard__get_highscore_for(this->lboard_screen->leaderboard, this->game_screen->player_name_inputs[1].prompt.label)); // TODO: NO
 }
 
+/**
+ * @brief Kártyapakli létrehozása.
+ * 
+ * Véletlenszerűen megkeveri a paklit és létrehozza a mezőkártyákat mindegyikhez.
+ *
+ * @param this A Carcassone struktúra.
+ */
 void Carcassone__init_pile(Carcassone* this)
 {
-    // TODO: put this in a config file
+    // ? TODO: put this in a config file
     TileType pile[PILE_SIZE] = {
         FIELD_CLOISTER_ROAD_S, FIELD_CLOISTER_ROAD_S,
         FIELD_CLOISTER_ROAD_S, FIELD_CLOISTER_ROAD_S,
@@ -303,6 +319,13 @@ void Carcassone__init_pile(Carcassone* this)
     this->game_screen->pile_index = 0U;
 }
 
+/**
+ * @brief Játéktábla létrehozása.
+ * 
+ * Létrehozza a játéktáblát és le is helyezi a kezdőkártyát.
+ *
+ * @param this A Carcassone struktúra.
+ */
 void Carcassone__init_board(Carcassone* this)
 {
     // BOARD_SIZE * BOARD_SIZE 2D array
@@ -322,9 +345,13 @@ void Carcassone__init_board(Carcassone* this)
         (SDL_Point){BOARD_SIZE / 2, BOARD_SIZE / 2}, this->game_screen->map_offset);
 }
 
+/**
+ * @brief Játéktábla renderelése.
+ * 
+ * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
+ */
 void Carcassone__render_board(Carcassone* this)
 {
-    // TODO: temp
     SDL_Rect viewport_rect = {this->game_screen->map_offset.x, this->game_screen->map_offset.y, 600, this->height - this->game_screen->map_offset.y - 10};
     SDL_SetRenderTarget(this->renderer, this->game_screen->board_texture);
     SDL_RenderClear(this->renderer);
@@ -353,12 +380,22 @@ void Carcassone__render_board(Carcassone* this)
     //SDL_RenderDrawRect(this->renderer, &viewport_rect);
 }
 
+/**
+ * @brief A splash cím renderelése.
+ * 
+ * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
+ */
 void Carcassone__render_splash_title(Carcassone* this)
 {
     SDL_RenderCopy(this->renderer, this->splash_title, NULL,
         &(SDL_Rect){this->game_screen->map_offset.x, 0, 400, 120});
 }
 
+/**
+ * @brief A pakli tetején levő kártya renderelése.
+ * 
+ * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
+ */
 void Carcassone__render_drawn_tile(Carcassone* this)
 {
     SDL_Rect ts_rect = TilesetWrapper__get_texture_rect_for(&this->game_screen->tileset_wrapper, this->game_screen->drawn_tile->type);
@@ -382,7 +419,12 @@ void Carcassone__render_drawn_tile(Carcassone* this)
         this->game_screen->drawn_tile->rotation, NULL, SDL_FLIP_NONE);
 }
 
-void Carcassone__render_player_stats(Carcassone* this)
+/**
+ * @brief A splash cím renderelése.
+ * 
+ * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
+ */
+void Carcassone__render_player_stats(Carcassone* this) // TODO
 {
     return;
     
@@ -404,7 +446,15 @@ void Carcassone__render_player_stats(Carcassone* this)
     }
 }
 
-void Carcassone__move_board(Carcassone* this, SDL_KeyCode key)
+/**
+ * @brief Játéktábla mozgatása.
+ * 
+ * A nyilak segítségével a játéktábla látható részét mozgatja.
+ *
+ * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
+ * @param key A beolvasott billentyű (a Carcassone__handle_inputs(Carcassone*)-tól kapja meg).
+ */
+void Carcassone__move_board(Carcassone* this, SDL_KeyCode key) // TODO
 {
     float mvx = 0.0f;
     float mvy = 0.0f;
@@ -426,6 +476,13 @@ void Carcassone__move_board(Carcassone* this, SDL_KeyCode key)
     }
 }
 
+/**
+ * @brief A splash cím renderelése.
+ * 
+ * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
+ * @param tcoords A kapott kártya potenciális helye a táblán.
+ * @return Letehető-e a megfelelő pozícióba az adott kártya.
+ */
 bool Carcassone__check_surrounding_tiles(Carcassone* this, SDL_Point tcoords)
 {
     DBG_LOG("type: %d, n: %u, e: %u, s: %u, w: %u",
@@ -439,14 +496,9 @@ bool Carcassone__check_surrounding_tiles(Carcassone* this, SDL_Point tcoords)
     int y = tcoords.y;
 
     // TODO: for loop
+    // még egy korábbi refaktor előtti állapotból maradt így, amikor nem lehetett volna ciklussal megoldani
     bool next_to_placed = false;
     if(y - 1 >= 0) {
-        DBG_LOG("NORTH type: %d, n: %u, e: %u, s: %u, w: %u",
-            this->game_screen->board[x][y-1].type,
-            this->game_screen->board[x][y-1].connections[NORTH], 
-            this->game_screen->board[x][y-1].connections[EAST],
-            this->game_screen->board[x][y-1].connections[SOUTH],
-            this->game_screen->board[x][y-1].connections[WEST]);
         if(this->game_screen->board[x][y-1].type != EMPTY) next_to_placed = true;
         if(this->game_screen->board[x][y-1].connections[SOUTH] != this->game_screen->drawn_tile->connections[NORTH] 
             && this->game_screen->board[x][y-1].connections[SOUTH] != NONE) {
@@ -454,12 +506,6 @@ bool Carcassone__check_surrounding_tiles(Carcassone* this, SDL_Point tcoords)
         }
     }
     if(y + 1 < BOARD_SIZE) {
-        DBG_LOG("SOUTH type: %d, n: %u, e: %u, s: %u, w: %u",
-            this->game_screen->board[x][y+1].type,
-            this->game_screen->board[x][y+1].connections[NORTH], 
-            this->game_screen->board[x][y+1].connections[EAST],
-            this->game_screen->board[x][y+1].connections[SOUTH],
-            this->game_screen->board[x][y+1].connections[WEST]);
         if(this->game_screen->board[x][y+1].type != EMPTY) next_to_placed = true;
         if(this->game_screen->board[x][y+1].connections[NORTH] != this->game_screen->drawn_tile->connections[SOUTH]
             && this->game_screen->board[x][y+1].connections[NORTH] != NONE) {
@@ -467,12 +513,6 @@ bool Carcassone__check_surrounding_tiles(Carcassone* this, SDL_Point tcoords)
         }
     }
     if(x - 1 >= 0) {
-        DBG_LOG("WEST type: %d, n: %u, e: %u, s: %u, w: %u",
-            this->game_screen->board[x-1][y].type,
-            this->game_screen->board[x-1][y].connections[NORTH], 
-            this->game_screen->board[x-1][y].connections[EAST],
-            this->game_screen->board[x-1][y].connections[SOUTH],
-            this->game_screen->board[x-1][y].connections[WEST]);
         if(this->game_screen->board[x-1][y].type != EMPTY) next_to_placed = true;
         if(this->game_screen->board[x-1][y].connections[EAST] != this->game_screen->drawn_tile->connections[WEST] 
             && this->game_screen->board[x-1][y].connections[EAST] != NONE) {
@@ -491,7 +531,14 @@ bool Carcassone__check_surrounding_tiles(Carcassone* this, SDL_Point tcoords)
 
 }
 
-void Carcassone__draw_new(Carcassone* this)
+/**
+ * @brief Új kártya húzása a pakli tetejéről.
+ * 
+ * Húz egy új kártyát, ha kifogyott akkor kilép a menübe (egyelőre).
+ *
+ * @param this A Carcassone struktúra.
+ */
+void Carcassone__draw_new(Carcassone* this) // TODO
 {
     this->game_screen->drawn_tile = this->game_screen->card_pile[this->game_screen->pile_index];
     ++this->game_screen->pile_index;
@@ -501,6 +548,11 @@ void Carcassone__draw_new(Carcassone* this)
     }
 }
 
+/**
+ * @brief A fő programciklus.
+ * 
+ * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
+ */
 void Carcassone__run(Carcassone* this)
 {
     this->is_running = true;
@@ -518,7 +570,7 @@ void Carcassone__run(Carcassone* this)
                 break;
         }
 
-        // TOOD: temp until FPS is implemented
+        // TODO: temp until FPS is implemented
         SDL_Delay(1);
     }
 }

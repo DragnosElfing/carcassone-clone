@@ -1,3 +1,4 @@
+#include <SDL2/SDL_log.h>
 #ifdef _CRCLONE_DEBUG
     #include "debug/debugmalloc.h"
 #endif
@@ -5,14 +6,20 @@
 #include "app.h"
 
 /**
- * @brief The main entry point of the entire program.
- *
- * Constructs, inits the game loop for the game. Also destroys it on exit.
+ * @brief A program entry pointja.
+ * 
+ * Létrehozza és inicializálja a programciklust, illetve biztosítja a lefoglalt memória helyes felszabadulását.
  *
  * @return 0
  */
 int main(void)
 {
+    #ifdef _CRCLONE_DEBUG
+        SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
+    #else
+        SDL_LogSetAllPriority(SDL_LOG_PRIORITY_CRITICAL);
+    #endif
+
     Carcassone* game = Carcassone__construct(1280, 960, "Carcassone másolat - Prog1 NHF");
     if(game != NULL) {
         Carcassone__run(game);

@@ -86,27 +86,34 @@ $(document).ready(function(){initNavTree('main_8c_source.html',''); initResizabl
   <div class="headertitle"><div class="title">main.c</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="main_8c.html">Ugrás a fájl dokumentációjához.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifdef _CRCLONE_DEBUG</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">    #include &quot;debug/debugmalloc.h&quot;</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;<a class="code" href="app_8h.html">app.h</a>&quot;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">   14</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>)</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>{</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    <a class="code hl_struct" href="structCarcassone.html">Carcassone</a>* game = <a class="code hl_function" href="app_8c.html#abfda02713b5d4eddd7c006713aff26be">Carcassone__construct</a>(1280, 960, <span class="stringliteral">&quot;Carcassone másolat - Prog1 NHF&quot;</span>);</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    <span class="keywordflow">if</span>(game != NULL) {</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        <a class="code hl_function" href="app_8c.html#a7f1e5984ed4f1e374114a4a62ba4dde5">Carcassone__run</a>(game);</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        <a class="code hl_function" href="app_8c.html#a84c456ab981400052ea029d7ca9458c3">Carcassone__destroy</a>(game);</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    }</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>}</div>
-<div class="ttc" id="aapp_8c_html_a7f1e5984ed4f1e374114a4a62ba4dde5"><div class="ttname"><a href="app_8c.html#a7f1e5984ed4f1e374114a4a62ba4dde5">Carcassone__run</a></div><div class="ttdeci">void Carcassone__run(Carcassone *this)</div><div class="ttdef"><b>Definition:</b> <a href="app_8c_source.html#l00499">app.c:499</a></div></div>
-<div class="ttc" id="aapp_8c_html_a84c456ab981400052ea029d7ca9458c3"><div class="ttname"><a href="app_8c.html#a84c456ab981400052ea029d7ca9458c3">Carcassone__destroy</a></div><div class="ttdeci">void Carcassone__destroy(Carcassone *this)</div><div class="ttdef"><b>Definition:</b> <a href="app_8c_source.html#l00102">app.c:102</a></div></div>
+<a href="main_8c.html">Ugrás a fájl dokumentációjához.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#include &lt;SDL2/SDL_log.h&gt;</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#ifdef _CRCLONE_DEBUG</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">    #include &quot;debug/debugmalloc.h&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;<a class="code" href="app_8h.html">app.h</a>&quot;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">   15</a></span><span class="keywordtype">int</span> <a class="code hl_function" href="main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>)</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>{</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">    #ifdef _CRCLONE_DEBUG</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">    #else</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        SDL_LogSetAllPriority(SDL_LOG_PRIORITY_CRITICAL);</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">    #endif</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <a class="code hl_struct" href="structCarcassone.html">Carcassone</a>* game = <a class="code hl_function" href="app_8c.html#abfda02713b5d4eddd7c006713aff26be">Carcassone__construct</a>(1280, 960, <span class="stringliteral">&quot;Carcassone másolat - Prog1 NHF&quot;</span>);</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <span class="keywordflow">if</span>(game != NULL) {</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>        <a class="code hl_function" href="app_8c.html#a7f1e5984ed4f1e374114a4a62ba4dde5">Carcassone__run</a>(game);</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>        <a class="code hl_function" href="app_8c.html#a84c456ab981400052ea029d7ca9458c3">Carcassone__destroy</a>(game);</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    }</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>}</div>
+<div class="ttc" id="aapp_8c_html_a7f1e5984ed4f1e374114a4a62ba4dde5"><div class="ttname"><a href="app_8c.html#a7f1e5984ed4f1e374114a4a62ba4dde5">Carcassone__run</a></div><div class="ttdeci">void Carcassone__run(Carcassone *this)</div><div class="ttdoc">A fő programciklus.</div><div class="ttdef"><b>Definition:</b> <a href="app_8c_source.html#l00555">app.c:555</a></div></div>
+<div class="ttc" id="aapp_8c_html_a84c456ab981400052ea029d7ca9458c3"><div class="ttname"><a href="app_8c.html#a84c456ab981400052ea029d7ca9458c3">Carcassone__destroy</a></div><div class="ttdeci">void Carcassone__destroy(Carcassone *this)</div><div class="ttdoc">Felszabadítja a megadott Carcassone struktúra által lefoglalt memóriát.</div><div class="ttdef"><b>Definition:</b> <a href="app_8c_source.html#l00101">app.c:101</a></div></div>
 <div class="ttc" id="aapp_8c_html_abfda02713b5d4eddd7c006713aff26be"><div class="ttname"><a href="app_8c.html#abfda02713b5d4eddd7c006713aff26be">Carcassone__construct</a></div><div class="ttdeci">Carcassone * Carcassone__construct(int width, int height, char const *title)</div><div class="ttdoc">Initicializálja az összes nézetet, SDL és TTF kontextusokat.</div><div class="ttdef"><b>Definition:</b> <a href="app_8c_source.html#l00027">app.c:27</a></div></div>
 <div class="ttc" id="aapp_8h_html"><div class="ttname"><a href="app_8h.html">app.h</a></div></div>
-<div class="ttc" id="amain_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdoc">The main entry point of the entire program.</div><div class="ttdef"><b>Definition:</b> <a href="main_8c_source.html#l00014">main.c:14</a></div></div>
+<div class="ttc" id="amain_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdoc">A program entry pointja.</div><div class="ttdef"><b>Definition:</b> <a href="main_8c_source.html#l00015">main.c:15</a></div></div>
 <div class="ttc" id="astructCarcassone_html"><div class="ttname"><a href="structCarcassone.html">Carcassone</a></div><div class="ttdef"><b>Definition:</b> <a href="app_8h_source.html#l00025">app.h:26</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
