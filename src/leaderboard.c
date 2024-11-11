@@ -15,7 +15,13 @@ Leaderboard* Leaderboard__construct(char const* records_file_path)
     size_t entries_size = 1U;
     new_lboard->entries = malloc(entries_size * sizeof(LeaderboardEntry));
     size_t entry_idx = 0U;
-    while(fscanf(records_f, "%24s %u", name, &record) != EOF) {
+    int read_status; 
+    while((read_status = fscanf(records_f, "%24s %u", name, &record)) != EOF) {
+        if(read_status != 2 && read_status != EOF) {
+            // hibás fájlformátum
+            return NULL;
+        }
+
         if(entry_idx >= entries_size) {
             entries_size *= 2;
             new_lboard->entries = realloc(new_lboard->entries, entries_size * sizeof(LeaderboardEntry));

@@ -545,6 +545,7 @@ void Carcassone__draw_new(Carcassone* this) // TODO
     if(this->game_screen->pile_index >= PILE_SIZE) {
         DBG_LOG("Kifogytunk a kártyákból!");
         this->state = MENU;
+        this->game_screen->is_ready = false;
     }
 }
 
@@ -556,21 +557,46 @@ void Carcassone__draw_new(Carcassone* this) // TODO
 void Carcassone__run(Carcassone* this)
 {
     this->is_running = true;
+    // Uint64 now;
+    // Uint64 last = 0U;
+    // float accumulator = 0U;
+    // while(this->is_running) {
+    //     // Calculate delta time
+    //     now = SDL_GetTicks64();
+    //     accumulator += MIN((float)(now - last), 1000.0f / FPS);
+    //     last = now;
+    //     for(float delta; accumulator >= (delta = 1.0f / FPS); accumulator -= delta) { // TOOD: this is just bad
+    //         printf("ham!\n");
+    //         switch(this->state) {
+    //         case MENU:
+    //             Carcassone__Menu__render(this);
+    //             break;
+    //         case LEADERBOARD:
+    //             Carcassone__Lboard__render(this);
+    //             break;
+    //         case GAME:
+    //             Carcassone__Game__render(this);
+    //             break;
+    //         }
+    //     }
+
+    //     Carcassone__handle_input(this);
+    // }
+
     while(this->is_running) {
-        Carcassone__handle_input(this);
         switch(this->state) {
-            case MENU:
-                Carcassone__Menu__render(this);
-                break;
-            case LEADERBOARD:
-                Carcassone__Lboard__render(this);
-                break;
-            case GAME:
-                Carcassone__Game__render(this);
-                break;
+        case MENU:
+            Carcassone__Menu__render(this);
+            break;
+        case LEADERBOARD:
+            Carcassone__Lboard__render(this);
+            break;
+        case GAME:
+            Carcassone__Game__render(this);
+            break;
         }
 
-        // TODO: temp until FPS is implemented
-        SDL_Delay(1);
+        Carcassone__handle_input(this);
     }
+
 }

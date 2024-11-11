@@ -57,7 +57,6 @@ void Carcassone__Lboard__construct(Carcassone* this)
     this->lboard_screen = malloc(sizeof(LeaderboardScreen));
     // Load and sort leaderboard data
     this->lboard_screen->leaderboard = Leaderboard__construct("res/data/records.dat");
-    Leaderboard__sort(this->lboard_screen->leaderboard);
 
     this->lboard_screen->back_button = 
         Carcassone__Button__construct(this, "VISSZA", (SDL_Rect){this->width - 150, 10, 140, 50}, (SDL_Color){COLOR_WHITE}, 
@@ -66,28 +65,38 @@ void Carcassone__Lboard__construct(Carcassone* this)
     // Texture for the leaderboard entries
     this->lboard_screen->list_texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
         1000, this->height - 200);
-
-    char score_string[10+1];
-    int w, h;
     SDL_SetRenderTarget(this->renderer, this->lboard_screen->list_texture);
-    for(size_t place = 0U; place < MIN(5, this->lboard_screen->leaderboard->entries_size); ++place) {
-        char* curr_name = this->lboard_screen->leaderboard->entries[place].name;
-        TTF_SizeUTF8(this->default_font, curr_name, &w, &h);
-        SDL_RenderCopy(this->renderer, SDL_CreateTextureFromSurface(
-            this->renderer, TTF_RenderUTF8_Blended(this->default_font, this->lboard_screen->leaderboard->entries[place].name,
-            (SDL_Color){COLOR_WHITE})), 
-            NULL, &(SDL_Rect){0, 100*place, 
-                w * 0.4, 
-                h * 0.4});
 
-        sprintf(score_string, "%u", this->lboard_screen->leaderboard->entries[place].highscore);
+    if(this->lboard_screen->leaderboard != NULL) {
+        Leaderboard__sort(this->lboard_screen->leaderboard);
+        char score_string[10+1];
+        int w, h;
+        for(size_t place = 0U; place < MIN(5, this->lboard_screen->leaderboard->entries_size); ++place) {
+            char* curr_name = this->lboard_screen->leaderboard->entries[place].name;
+            TTF_SizeUTF8(this->default_font, curr_name, &w, &h);
+            SDL_RenderCopy(this->renderer, SDL_CreateTextureFromSurface(
+                this->renderer, TTF_RenderUTF8_Blended(this->default_font, this->lboard_screen->leaderboard->entries[place].name,
+                (SDL_Color){COLOR_WHITE})), 
+                NULL, &(SDL_Rect){0, 100*place, 
+                    w * 0.4, 
+                    h * 0.4});
+
+            sprintf(score_string, "%u", this->lboard_screen->leaderboard->entries[place].highscore);
+            SDL_RenderCopy(this->renderer, SDL_CreateTextureFromSurface(
+                this->renderer, TTF_RenderUTF8_Blended(this->default_font, score_string,
+                (SDL_Color){COLOR_WHITE})), NULL, &(SDL_Rect){900, 100*place, 
+                    50 / (this->lboard_screen->leaderboard->entries[place].highscore < 10 ? 2 : 1), 80});
+        }
+    } else {
+        int w, h;
+        TTF_SizeUTF8(this->default_font, "Hibás fájlformátum!", &w, &h);
         SDL_RenderCopy(this->renderer, SDL_CreateTextureFromSurface(
-            this->renderer, TTF_RenderUTF8_Blended(this->default_font, score_string,
-            (SDL_Color){COLOR_WHITE})), NULL, &(SDL_Rect){900, 100*place, 
-                50 / (this->lboard_screen->leaderboard->entries[place].highscore < 10 ? 2 : 1), 80});
+            this->renderer, TTF_RenderUTF8_Blended(this->default_font, 
+            "Hibás fájlformátum!", (SDL_Color){COLOR_WHITE})), NULL, 
+            &(SDL_Rect){100, 100, w*0.6f, h*0.6f});
     }
-    SDL_SetRenderTarget(this->renderer, NULL);
 
+    SDL_SetRenderTarget(this->renderer, NULL);
     SDL_SetTextureBlendMode(this->lboard_screen->list_texture, SDL_BLENDMODE_BLEND);
 }
 void Carcassone__Lboard__destroy(Carcassone* this)
