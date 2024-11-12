@@ -28,7 +28,7 @@ typedef struct
 typedef struct
 {
     SDL_Texture* background;
-    SDL_FRect button_container;
+    SDL_Rect button_container;
     Button start_button;
     Button lboard_button;
 } MenuScreen;
@@ -43,7 +43,7 @@ typedef struct
 typedef struct
 {
     bool is_ready;
-    SDL_Point map_offset;
+    SDL_Point board_offset;
     Tile** board;
     Tile* drawn_tile;
     Tile* card_pile[PILE_SIZE];
@@ -56,6 +56,7 @@ typedef struct
     SDL_Texture* pile_counter[PILE_SIZE];
     TilesetWrapper tileset_wrapper;
     SDL_Texture* board_texture;
+    int held_arrow_keys[4];
 } GameScreen;
 
 #endif

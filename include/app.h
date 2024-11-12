@@ -1,6 +1,7 @@
 #ifndef CRCLONE_APP_H
 #define CRCLONE_APP_H
 
+#include <SDL2/SDL_scancode.h>
 #include <stdbool.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL.h>
@@ -39,8 +40,20 @@ typedef struct
     TTF_Font* default_font;
     TTF_Font* small_font;
 } Carcassone;
-Carcassone* Carcassone__construct(int, int, char const*);
+
+/**
+ * @brief Initicializálja az összes nézetet, SDL és TTF kontextusokat.
+ *
+ * Megjegyzés: A lefoglalt memória megfelelő felszabadításához meg kell hívni a Carcassone__destroy(Carcassone*) függvényt.
+ *
+ * @param width Az ablak szélessége.
+ * @param height Az ablak magassága.
+ * @param title Az ablak címe.
+ * @return Pointer az újonnan létrehozott Carcassone structra.
+ */
+Carcassone* Carcassone__construct(int width, int height, char const* title);
 void Carcassone__destroy(Carcassone*);
+void Carcassone__switch_state(Carcassone*, AppState);
 void Carcassone__Menu__construct(Carcassone*);
 void Carcassone__Menu__destroy(Carcassone*);
 void Carcassone__Lboard__construct(Carcassone*);
@@ -60,12 +73,12 @@ void Carcassone__init_players(Carcassone*);
 void Carcassone__init_pile(Carcassone*);
 void Carcassone__init_board(Carcassone*);
 void Carcassone__init_counter(Carcassone*);
-void Carcassone__move_board(Carcassone*, SDL_KeyCode);
+void Carcassone__move_board(Carcassone*, SDL_Scancode);
 void Carcassone__draw_new(Carcassone*);
 bool Carcassone__check_surrounding_tiles(Carcassone*, SDL_Point);
 Button Carcassone__Button__construct(Carcassone*, char*, SDL_Rect, SDL_Color, SDL_Color);
 bool Carcassone__Button__hover(Carcassone*, Button*, SDL_Point);
-void Carcassone__Button__render(Carcassone*, Button*);
+void Carcassone__Button__render(Carcassone*, Button*, bool);
 void Carcassone__Button__destroy(Carcassone*, Button*);
 Prompt Carcassone__Prompt__construct(Carcassone*, char*, bool, SDL_Rect, SDL_Color, SDL_Color);
 void Carcassone__Prompt__edit(Carcassone*, Prompt*, char*, bool);
@@ -73,6 +86,6 @@ void Carcassone__Prompt__render(Carcassone*, Prompt*);
 void Carcassone__Prompt__toggle_focus(Carcassone*, Prompt*);
 void Carcassone__Prompt__destroy(Carcassone*, Prompt*);
 
-static void Carcassone__render_text_to(Carcassone*, SDL_Texture*, char const*);
+//static void Carcassone__render_text_to(Carcassone*, SDL_Texture*, char const*);
 
 #endif

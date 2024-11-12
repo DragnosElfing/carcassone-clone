@@ -30,12 +30,19 @@ Button Carcassone__Button__construct(Carcassone* this, char* label, SDL_Rect glo
     return new_button;
 }
 
-void Carcassone__Button__render(Carcassone* this, Button* button)
+void Carcassone__Button__render(Carcassone* this, Button* button, bool focus)
 {
     SDL_RenderSetViewport(this->renderer, &button->global_rect);
+    
     SDL_SetRenderDrawColor(this->renderer, button->bg_color.r, button->bg_color.g, button->bg_color.b, button->bg_color.a);
     SDL_RenderFillRect(this->renderer, &button->rect);
     SDL_RenderCopy(this->renderer,button->label_texture, NULL, NULL);
+
+    if(focus) {
+        SDL_SetRenderDrawColor(this->renderer, 255, 0, 0, 255);
+        SDL_RenderDrawRect(this->renderer, NULL);
+    }
+
     SDL_RenderSetViewport(this->renderer, NULL);
 }
 
@@ -82,7 +89,7 @@ void Carcassone__Prompt__toggle_focus(Carcassone* this, Prompt* prompt)
 
 void Carcassone__Prompt__render(Carcassone* this, Prompt* prompt)
 {
-    Carcassone__Button__render(this, &prompt->prompt);
+    Carcassone__Button__render(this, &prompt->prompt, prompt->is_active);
 }
 
 void Carcassone__Prompt__destroy(Carcassone* this, Prompt* prompt)

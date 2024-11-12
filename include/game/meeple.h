@@ -6,7 +6,7 @@
 #include "game/tile.h"
 
 typedef struct {
-    unsigned int x, y;
+    int x, y;
     Tile* tile;
     SDL_Texture* texture;
     bool is_placed;

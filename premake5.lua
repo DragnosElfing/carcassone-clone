@@ -47,7 +47,9 @@ project "CarcassoneClone"
             "unused-parameter",
             "newline-eof",
             "padded",
-            "switch-enum"
+            "switch-enum",
+            "gnu-zero-variadic-macro-arguments",
+            "declaration-after-statement"
         }
 
     filter "configurations:Release"
