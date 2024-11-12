@@ -15,8 +15,8 @@ Button Carcassone__Button__construct(Carcassone* this, char* label, SDL_Rect glo
     Button new_button = {.label = label, .bg_color = bg_color, .global_rect = global_rect};
 
     int rect_width, rect_height;
-    TTF_SizeUTF8(this->default_font, label, &rect_width, &rect_height);
-    new_button.rect = (SDL_Rect){
+    TTF_SizeUTF8(this->small_font, label, &rect_width, &rect_height);
+    new_button.label_rect = (SDL_Rect){
         0, 0,
         rect_width, rect_height
     };
@@ -35,8 +35,8 @@ void Carcassone__Button__render(Carcassone* this, Button* button, bool focus)
     SDL_RenderSetViewport(this->renderer, &button->global_rect);
     
     SDL_SetRenderDrawColor(this->renderer, button->bg_color.r, button->bg_color.g, button->bg_color.b, button->bg_color.a);
-    SDL_RenderFillRect(this->renderer, &button->rect);
-    SDL_RenderCopy(this->renderer,button->label_texture, NULL, NULL);
+    SDL_RenderFillRect(this->renderer, NULL);
+    SDL_RenderCopy(this->renderer,button->label_texture, NULL, &button->label_rect);
 
     if(focus) {
         SDL_SetRenderDrawColor(this->renderer, 255, 0, 0, 255);
@@ -75,9 +75,14 @@ void Carcassone__Prompt__edit(Carcassone* this, Prompt* prompt, char* new_label,
 
     if(prompt->prompt.label_texture != NULL) SDL_DestroyTexture(prompt->prompt.label_texture);
 
-    SDL_Surface* updated_surface = TTF_RenderUTF8_Blended(this->default_font, prompt->prompt.label, (SDL_Color){0, 0, 0, 255});
+    SDL_Surface* updated_surface = TTF_RenderUTF8_Blended(this->small_font, prompt->prompt.label, (SDL_Color){0, 0, 0, 255});
     if(updated_surface != NULL) {
         prompt->prompt.label_texture = SDL_CreateTextureFromSurface(this->renderer, updated_surface);
+        
+        int new_width;
+        TTF_SizeUTF8(this->small_font, prompt->prompt.label, &new_width, NULL);
+        prompt->prompt.label_rect.w = new_width;
+
         SDL_FreeSurface(updated_surface);
     }
 }

@@ -13,7 +13,7 @@
 
 typedef struct
 {
-    SDL_Rect rect, global_rect;
+    SDL_Rect label_rect, global_rect;
     SDL_Color bg_color;
     char* label;
     SDL_Texture* label_texture;

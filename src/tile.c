@@ -22,7 +22,7 @@ bool Tile__point_in_tile(Tile* this, SDL_Point pt)
         && this->global_coords.y < pt.y && pt.y <= this->global_coords.y + TILE_SIZE;
 }
 
-void Tile__move_by(Tile* this, int mvx, int mvy)
+void Tile__move_by(Tile* this, float mvx, float mvy)
 {
     this->local_coords = (SDL_Point){this->local_coords.x + mvx * TILE_SIZE, this->local_coords.y + mvy * TILE_SIZE};
     this->global_coords = (SDL_Point){this->global_coords.x + mvx * TILE_SIZE, this->global_coords.y + mvy * TILE_SIZE};

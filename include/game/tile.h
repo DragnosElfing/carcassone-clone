@@ -54,7 +54,7 @@ typedef struct {
 } Tile;
 void Tile__construct(Tile*, TileType, SDL_Point, SDL_Point);
 bool Tile__point_in_tile(Tile*, SDL_Point);
-void Tile__move_by(Tile*, int, int);
+void Tile__move_by(Tile*, float, float);
 void Tile__rotate(Tile*);
 void Tile__set_rotation(Tile*, unsigned short);
 void Tile__set_type(Tile*, TileType, unsigned short);

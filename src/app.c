@@ -507,21 +507,21 @@ void Carcassone__render_player_stats(Carcassone* this) // TODO
  */
 void Carcassone__move_board(Carcassone* this, SDL_Scancode key) // TODO
 {
-    int mvx = 0;
-    int mvy = 0;
+    float mvx = 0;
+    float mvy = 0;
 
     // TODO: global state, check KEYDOWN and KEYUP
     if(this->game_screen->held_arrow_keys[0]) {
-        mvx -= 1;
+        mvx -= 0.01f;
     }
     if(this->game_screen->held_arrow_keys[1]) {
-        mvx += 1;
+        mvx += 0.01f;
     }
     if(this->game_screen->held_arrow_keys[2]) {
-        mvy -= 1;
+        mvy -= 0.01f;
     }
     if(this->game_screen->held_arrow_keys[3]) {
-        mvy += 1;
+        mvy += 0.01f;
     }
 
     for(int y = 0U; y < BOARD_SIZE; ++y) {
