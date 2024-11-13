@@ -22,7 +22,6 @@ typedef struct
 typedef struct
 {
     Button prompt;
-    bool is_active;
 } Prompt;
 
 typedef struct
@@ -43,20 +42,25 @@ typedef struct
 typedef struct
 {
     bool is_ready;
-    SDL_Point board_offset;
+    int held_arrow_keys[4];
+    SDL_FPoint board_offset;
+    
     Tile** board;
     Tile* drawn_tile;
     Tile* card_pile[PILE_SIZE];
     size_t pile_index;
+    
     Player players[2];
+    Player* curr_player;
+
     Prompt player_name_inputs[2];
     Prompt* active_input;
-    Button ready_button;
-    Player* curr_player;
+    
+    Button ready_button, end_turn_button, concede_button;
+    
     SDL_Texture* pile_counter[PILE_SIZE];
     TilesetWrapper tileset_wrapper;
     SDL_Texture* board_texture;
-    int held_arrow_keys[4];
 } GameScreen;
 
 #endif

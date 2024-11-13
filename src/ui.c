@@ -30,18 +30,13 @@ Button Carcassone__Button__construct(Carcassone* this, char* label, SDL_Rect glo
     return new_button;
 }
 
-void Carcassone__Button__render(Carcassone* this, Button* button, bool focus)
+void Carcassone__Button__render(Carcassone* this, Button* button)
 {
     SDL_RenderSetViewport(this->renderer, &button->global_rect);
     
     SDL_SetRenderDrawColor(this->renderer, button->bg_color.r, button->bg_color.g, button->bg_color.b, button->bg_color.a);
     SDL_RenderFillRect(this->renderer, NULL);
     SDL_RenderCopy(this->renderer,button->label_texture, NULL, &button->label_rect);
-
-    if(focus) {
-        SDL_SetRenderDrawColor(this->renderer, 255, 0, 0, 255);
-        SDL_RenderDrawRect(this->renderer, NULL);
-    }
 
     SDL_RenderSetViewport(this->renderer, NULL);
 }
@@ -51,7 +46,7 @@ void Carcassone__Button__destroy(Carcassone* this, Button* button)
     if(button->label_texture != NULL) SDL_DestroyTexture(button->label_texture);
 }
 
-Prompt Carcassone__Prompt__construct(Carcassone* this, char* default_label, bool autofocus, SDL_Rect global_rect, SDL_Color bg_color, SDL_Color text_color)
+Prompt Carcassone__Prompt__construct(Carcassone* this, char* default_label, SDL_Rect global_rect, SDL_Color bg_color, SDL_Color text_color)
 {
     char* label = malloc((24+1) * sizeof(char));
     for(size_t i = 0U; i <= strlen(default_label); ++i) {
@@ -59,7 +54,6 @@ Prompt Carcassone__Prompt__construct(Carcassone* this, char* default_label, bool
     }
     Prompt new_prompt = {
         .prompt = Carcassone__Button__construct(this, label, global_rect, bg_color, text_color),
-        .is_active = autofocus
     };
 
     return new_prompt;
@@ -87,14 +81,9 @@ void Carcassone__Prompt__edit(Carcassone* this, Prompt* prompt, char* new_label,
     }
 }
 
-void Carcassone__Prompt__toggle_focus(Carcassone* this, Prompt* prompt)
-{
-    prompt->is_active = !prompt->is_active;
-}
-
 void Carcassone__Prompt__render(Carcassone* this, Prompt* prompt)
 {
-    Carcassone__Button__render(this, &prompt->prompt, prompt->is_active);
+    Carcassone__Button__render(this, &prompt->prompt);
 }
 
 void Carcassone__Prompt__destroy(Carcassone* this, Prompt* prompt)

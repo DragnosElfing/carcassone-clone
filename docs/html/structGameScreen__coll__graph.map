@@ -1,9 +1,0 @@
-<map id="GameScreen" name="GameScreen">
-<area shape="rect" id="node1" title=" " alt="" coords="121,317,220,344"/>
-<area shape="rect" id="node2" href="$structTile.html" title=" " alt="" coords="5,5,48,32"/>
-<area shape="rect" id="node4" href="$structMeeple.html" title=" " alt="" coords="56,95,120,121"/>
-<area shape="rect" id="node3" href="$structPlayer.html" title=" " alt="" coords="59,213,117,240"/>
-<area shape="rect" id="node5" href="$structPrompt.html" title=" " alt="" coords="275,213,339,240"/>
-<area shape="rect" id="node6" href="$structButton.html" title=" " alt="" coords="149,95,209,121"/>
-<area shape="rect" id="node7" href="$structTilesetWrapper.html" title=" " alt="" coords="363,213,472,240"/>
-</map>

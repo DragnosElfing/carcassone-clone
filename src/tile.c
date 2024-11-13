@@ -6,17 +6,17 @@
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
 
-void Tile__construct(Tile* this, TileType type, SDL_Point lcoords, SDL_Point offset)
+void Tile__construct(Tile* this, TileType type, SDL_FPoint lcoords, SDL_FPoint offset)
 {
-    this->local_coords = (SDL_Point){lcoords.x * TILE_SIZE, lcoords.y * TILE_SIZE};
-    this->global_coords = (SDL_Point){this->local_coords.x + offset.x, this->local_coords.y + offset.y};
+    this->local_coords = (SDL_FPoint){lcoords.x * TILE_SIZE, lcoords.y * TILE_SIZE};
+    this->global_coords = (SDL_FPoint){this->local_coords.x + offset.x, this->local_coords.y + offset.y};
 
     this->rotatable = true;
     this->rotation = 0;
     Tile__set_type(this, type, this->rotation);
 }
 
-bool Tile__point_in_tile(Tile* this, SDL_Point pt)
+bool Tile__point_in_tile(Tile* this, SDL_FPoint pt)
 {
     return this->global_coords.x < pt.x && pt.x <= this->global_coords.x + TILE_SIZE
         && this->global_coords.y < pt.y && pt.y <= this->global_coords.y + TILE_SIZE;
@@ -24,8 +24,10 @@ bool Tile__point_in_tile(Tile* this, SDL_Point pt)
 
 void Tile__move_by(Tile* this, float mvx, float mvy)
 {
-    this->local_coords = (SDL_Point){this->local_coords.x + mvx * TILE_SIZE, this->local_coords.y + mvy * TILE_SIZE};
-    this->global_coords = (SDL_Point){this->global_coords.x + mvx * TILE_SIZE, this->global_coords.y + mvy * TILE_SIZE};
+    this->local_coords = (SDL_FPoint){this->local_coords.x + mvx * TILE_SIZE, this->local_coords.y + mvy * TILE_SIZE};
+    this->global_coords = (SDL_FPoint){this->global_coords.x + mvx * TILE_SIZE, this->global_coords.y + mvy * TILE_SIZE};
+
+    //if(this->type == CASTLE_CAP_WALL_ROAD_BY) DBG_LOG("(%f, %d)", this->local_coords.x + mvy * TILE_SIZE, (int)(this->local_coords.x + mvy * TILE_SIZE));
 }
 
 void Tile__rotate(Tile* this)

@@ -1,3 +1,4 @@
+#include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_scancode.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,7 +43,7 @@ Carcassone* Carcassone__construct(int width, int height, char const* title)
     }
 
     new_app->window = SDL_CreateWindow(title,
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
     if(new_app->window == NULL) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "Nem sikerült létrehozni az ablakot!");
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "%s", SDL_GetError());
@@ -180,14 +181,9 @@ void Carcassone__handle_input(Carcassone* this)
             if(!(this->state == GAME && !this->game_screen->is_ready)) break;
             if(event.text.text[0] == ' ') break;
 
-            if(this->game_screen->player_name_inputs[0].is_active) {
-                if(strlen(this->game_screen->player_name_inputs[0].prompt.label) < 24) {
-                    Carcassone__Prompt__edit(this, &this->game_screen->player_name_inputs[0], event.text.text, true);
-                }
-            } else if(this->game_screen->player_name_inputs[1].is_active){
-                if(strlen(this->game_screen->player_name_inputs[1].prompt.label) < 24) {
-                    Carcassone__Prompt__edit(this, &this->game_screen->player_name_inputs[1], event.text.text, true);
-                }
+            // TODO: count mb characters instead of single byte ones
+            if(strlen(this->game_screen->active_input->prompt.label) < 24) {
+                Carcassone__Prompt__edit(this, this->game_screen->active_input, event.text.text, true);
             }
             break;
         case SDL_TEXTEDITING:
@@ -206,21 +202,10 @@ void Carcassone__handle_input(Carcassone* this)
                     this->is_running = false;
                     break;
                 case SDLK_BACKSPACE:
-                    // TODO: ABSOLUTELY NOT, and handle utf8 characters
-                    if(this->game_screen->player_name_inputs[0].is_active) {
-                        if(strlen(this->game_screen->player_name_inputs[0].prompt.label) > 0) {
-                            remove_last_utf8_char(this->game_screen->player_name_inputs[0].prompt.label);
-                            Carcassone__Prompt__edit(this, &this->game_screen->player_name_inputs[0], this->game_screen->player_name_inputs[0].prompt.label, false);
-                        }
-                    } else if(this->game_screen->player_name_inputs[1].is_active){
-                        if(strlen(this->game_screen->player_name_inputs[1].prompt.label) > 0) {
-                            remove_last_utf8_char(this->game_screen->player_name_inputs[1].prompt.label);
-                            Carcassone__Prompt__edit(this, &this->game_screen->player_name_inputs[1], this->game_screen->player_name_inputs[1].prompt.label, false);
-                        }
+                    if(strlen(this->game_screen->active_input->prompt.label) > 0) {
+                        remove_last_utf8_char(this->game_screen->active_input->prompt.label);
+                        Carcassone__Prompt__edit(this, this->game_screen->active_input, this->game_screen->active_input->prompt.label, false);
                     }
-                    break;
-                case SDLK_d:
-                    if(this->game_screen->is_ready) Carcassone__draw_new(this);
                     break;
                 case SDLK_r:
                     if(this->game_screen->is_ready) Tile__rotate(this->game_screen->drawn_tile);
@@ -253,38 +238,45 @@ void Carcassone__handle_input(Carcassone* this)
             if(this->state != GAME) break;
 
             if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->game_screen->player_name_inputs[0].prompt.global_rect)) {
-                if(this->game_screen->player_name_inputs[0].is_active) break;
-                Carcassone__Prompt__toggle_focus(this, &this->game_screen->player_name_inputs[0]);
-                Carcassone__Prompt__toggle_focus(this, &this->game_screen->player_name_inputs[1]);
+                this->game_screen->active_input = &this->game_screen->player_name_inputs[0];
             } else if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->game_screen->player_name_inputs[1].prompt.global_rect)) {
-                if(this->game_screen->player_name_inputs[1].is_active) break;
-                Carcassone__Prompt__toggle_focus(this, &this->game_screen->player_name_inputs[1]);
-                Carcassone__Prompt__toggle_focus(this, &this->game_screen->player_name_inputs[0]);
+                this->game_screen->active_input = &this->game_screen->player_name_inputs[1];
             }
 
-            if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->game_screen->ready_button.global_rect)) {
-                this->game_screen->is_ready = true;
-                Carcassone__init_players(this);
-            }
+            if(!this->game_screen->is_ready) {
+                if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->game_screen->ready_button.global_rect)) {
+                    this->game_screen->is_ready = true;
+                    Carcassone__init_players(this);
+                }
+            } else {
+                if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->game_screen->end_turn_button.global_rect))
+                    Carcassone__draw_new(this);
+                if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->game_screen->concede_button.global_rect))
+                    Carcassone__switch_state(this, MENU);
+                
+                if(this->game_screen->curr_player->has_placed_card) break;
+                for(int y = 0; y < BOARD_SIZE; ++y) {
+                    for(int x = 0; x < BOARD_SIZE; ++x) {
+                        Tile* curr_tile = &this->game_screen->board[x][y];
+                        if(Tile__point_in_tile(curr_tile, (SDL_FPoint){event.button.x, event.button.y})
+                                && curr_tile->type == EMPTY
+                                && Carcassone__check_surrounding_tiles(this, (SDL_Point){x, y})
+                        ) {
+                            // TODO
+                            SDL_FPoint temp_new_local = {curr_tile->local_coords.x / TILE_SIZE,
+                                curr_tile->local_coords.y / TILE_SIZE};
+                            Tile__construct(curr_tile, this->game_screen->drawn_tile->type,
+                                temp_new_local, this->game_screen->board_offset);
+                            Tile__set_rotation(curr_tile, this->game_screen->drawn_tile->rotation);
 
-            for(int y = 0; y < BOARD_SIZE; ++y) {
-                for(int x = 0; x < BOARD_SIZE; ++x) {
-                    Tile* curr_tile = &this->game_screen->board[x][y];
-                    if(Tile__point_in_tile(curr_tile, (SDL_Point){event.button.x, event.button.y})
-                            && curr_tile->type == EMPTY
-                            && Carcassone__check_surrounding_tiles(this, (SDL_Point){x, y})
-                    ) {
-                        // TODO
-                        SDL_Point temp_new_local = {curr_tile->local_coords.x / TILE_SIZE,
-                            curr_tile->local_coords.y / TILE_SIZE};
-                        Tile__construct(curr_tile, this->game_screen->drawn_tile->type,
-                            temp_new_local, this->game_screen->board_offset);
-                        Tile__set_rotation(curr_tile, this->game_screen->drawn_tile->rotation);
+                            this->game_screen->curr_player->has_placed_card = true;
 
-                        Carcassone__draw_new(this);
+                            //Carcassone__draw_new(this);
+                        }
                     }
                 }
             }
+
             break;
         default:
             break;
@@ -309,7 +301,7 @@ void Carcassone__init_players(Carcassone* this) // TODO
             this->game_screen->player_name_inputs[1].prompt.label, 
             Leaderboard__get_highscore_for(this->lboard_screen->leaderboard, this->game_screen->player_name_inputs[1].prompt.label)); // TODO: NO
 
-    Player__toggle_turn_active(&this->game_screen->players[0]);
+    this->game_screen->curr_player = &this->game_screen->players[0];
 }
 
 /**
@@ -367,7 +359,7 @@ void Carcassone__init_pile(Carcassone* this)
 
     for(size_t n = 0U; n < PILE_SIZE; ++n) {
         this->game_screen->card_pile[n] = malloc(sizeof(Tile));
-        Tile__construct(this->game_screen->card_pile[n], pile[n], (SDL_Point){0, 0}, (SDL_Point){0, 0});
+        Tile__construct(this->game_screen->card_pile[n], pile[n], (SDL_FPoint){0, 0}, (SDL_FPoint){0, 0});
     }
 
     this->game_screen->pile_index = 0U;
@@ -390,13 +382,15 @@ void Carcassone__init_board(Carcassone* this)
 
     for(int y = 0; y < BOARD_SIZE; ++y) {
         for(int x = 0; x < BOARD_SIZE; ++x) {
-            Tile__construct(&this->game_screen->board[x][y], EMPTY, (SDL_Point){x, y}, this->game_screen->board_offset);
+            Tile__construct(&this->game_screen->board[x][y], EMPTY, (SDL_FPoint){x, y}, this->game_screen->board_offset);
         }
     }
 
     // Kezdőkártya
     Tile__construct(&this->game_screen->board[BOARD_SIZE / 2][BOARD_SIZE / 2], CASTLE_CAP_WALL_ROAD_BY,
-        (SDL_Point){BOARD_SIZE / 2, BOARD_SIZE / 2}, this->game_screen->board_offset);
+        (SDL_FPoint){BOARD_SIZE / 2.0f, BOARD_SIZE / 2.0f}, this->game_screen->board_offset);
+
+    
 }
 
 /**
@@ -406,7 +400,8 @@ void Carcassone__init_board(Carcassone* this)
  */
 void Carcassone__render_board(Carcassone* this)
 {
-    SDL_Rect viewport_rect = {this->game_screen->board_offset.x, this->game_screen->board_offset.y, 600, this->height - this->game_screen->board_offset.y - 10};
+    SDL_Rect viewport_rect = 
+        {this->game_screen->board_offset.x, this->game_screen->board_offset.y, 600, this->height - this->game_screen->board_offset.y - 10};
     SDL_SetRenderTarget(this->renderer, this->game_screen->board_texture);
     SDL_RenderClear(this->renderer);
 
@@ -458,7 +453,7 @@ void Carcassone__render_drawn_tile(Carcassone* this)
         &(SDL_Rect){this->game_screen->board_offset.x + 450, this->game_screen->board_offset.y - TILE_SIZE, TILE_SIZE-5, TILE_SIZE-5},
         this->game_screen->drawn_tile->rotation, NULL, SDL_FLIP_NONE);
 
-    SDL_Rect pile_index_rect = {this->game_screen->board_offset.x + 555, this->game_screen->board_offset.y - TILE_SIZE/2, 50, 50};
+    SDL_Rect pile_index_rect = {this->game_screen->board_offset.x + 555, this->game_screen->board_offset.y - TILE_SIZE/2.0f, 50, 50};
     if(PILE_SIZE - this->game_screen->pile_index < 10) {
         pile_index_rect.w /= 2;
         pile_index_rect.x += pile_index_rect.w/2;
@@ -468,9 +463,14 @@ void Carcassone__render_drawn_tile(Carcassone* this)
     // TODO: temp
     int mx, my;
     SDL_GetMouseState(&mx, &my);
-    SDL_RenderCopyEx(this->renderer, this->game_screen->tileset_wrapper.tile_set, &ts_rect,
-        &(SDL_Rect){mx - TILE_SIZE / 2, my - TILE_SIZE / 2, TILE_SIZE, TILE_SIZE},
-        this->game_screen->drawn_tile->rotation, NULL, SDL_FLIP_NONE);
+    if(!this->game_screen->curr_player->has_placed_card) {
+        SDL_RenderCopyEx(this->renderer, this->game_screen->tileset_wrapper.tile_set, &ts_rect,
+            &(SDL_Rect){mx - TILE_SIZE / 2, my - TILE_SIZE / 2, TILE_SIZE, TILE_SIZE},
+            this->game_screen->drawn_tile->rotation, NULL, SDL_FLIP_NONE);
+    } else if(this->game_screen->curr_player->meeples_at_hand > 0) {
+        SDL_RenderCopy(this->renderer, this->game_screen->curr_player->meeples[0].texture, NULL, 
+            &(SDL_Rect){mx - 64 / 2, my - 64 / 2, 64, 64});
+    }
 }
 
 /**
@@ -478,10 +478,11 @@ void Carcassone__render_drawn_tile(Carcassone* this)
  * 
  * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
  */
-void Carcassone__render_player_stats(Carcassone* this) // TODO
+void Carcassone__render_player_stats(Carcassone* this)
 {   
     if(this->game_screen->players[0].stat_panel != NULL) {
-        SDL_RenderCopy(this->renderer, this->game_screen->players[0].stat_panel, NULL, &(SDL_Rect){0, 0, 300, 700});
+        SDL_RenderCopy(this->renderer, this->game_screen->players[0].stat_panel, NULL, 
+            &(SDL_Rect){0, 0, 300, 700});
     }
 
     if(this->game_screen->players[1].stat_panel != NULL) {
@@ -490,11 +491,11 @@ void Carcassone__render_player_stats(Carcassone* this) // TODO
     }
 
     SDL_SetRenderDrawColor(this->renderer, 255, 0, 0, 255);
-    if(this->game_screen->players[0].is_turn_active) {
-        SDL_RenderDrawRect(this->renderer, &(SDL_Rect){0, 0, 300, 700});
-    } else if(this->game_screen->players[1].is_turn_active) {
-        SDL_RenderDrawRect(this->renderer, &(SDL_Rect){this->width - 300, 0, 300, 700});
-    }
+    // if(this->game_screen->players[0].is_turn_active) {
+    //     SDL_RenderDrawRect(this->renderer, &(SDL_Rect){0, 0, 300, 700});
+    // } else if(this->game_screen->players[1].is_turn_active) {
+    //     SDL_RenderDrawRect(this->renderer, &(SDL_Rect){this->width - 300, 0, 300, 700});
+    // }
 }
 
 /**
@@ -505,23 +506,22 @@ void Carcassone__render_player_stats(Carcassone* this) // TODO
  * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
  * @param key A beolvasott billentyű (a Carcassone__handle_inputs(Carcassone*)-tól kapja meg).
  */
-void Carcassone__move_board(Carcassone* this, SDL_Scancode key) // TODO
+void Carcassone__move_board(Carcassone* this, SDL_Scancode key)
 {
-    float mvx = 0;
-    float mvy = 0;
+    float mvx = 0.0f;
+    float mvy = 0.0f;
 
-    // TODO: global state, check KEYDOWN and KEYUP
     if(this->game_screen->held_arrow_keys[0]) {
-        mvx -= 0.01f;
+        mvx -= 0.002f;
     }
     if(this->game_screen->held_arrow_keys[1]) {
-        mvx += 0.01f;
+        mvx += 0.002f;
     }
     if(this->game_screen->held_arrow_keys[2]) {
-        mvy -= 0.01f;
+        mvy -= 0.002f;
     }
     if(this->game_screen->held_arrow_keys[3]) {
-        mvy += 0.01f;
+        mvy += 0.002f;
     }
 
     for(int y = 0U; y < BOARD_SIZE; ++y) {
@@ -590,14 +590,27 @@ void Carcassone__draw_new(Carcassone* this) // TODO
 {
     this->game_screen->drawn_tile = this->game_screen->card_pile[this->game_screen->pile_index];
     ++this->game_screen->pile_index;
-    for(size_t p = 0U; p < 2; ++p) {
-        Player__toggle_turn_active(&this->game_screen->players[p]);
+
+    if(this->game_screen->curr_player != NULL) {
+        this->game_screen->curr_player->has_placed_card = false;
     }
 
     if(this->game_screen->pile_index >= PILE_SIZE) {
         DBG_LOG("Kifogytunk a kártyákból!");
+        Carcassone__show_finish_screen(this);
         Carcassone__switch_state(this, MENU);
     }
+}
+
+void Carcassone__show_finish_screen(Carcassone* this)
+{
+    if(this->game_screen->players[0].score == this->game_screen->players[1].score) {
+        DBG_LOG("Holtverseny!");
+        return;
+    }
+    Player* winner = this->game_screen->players[0].score > this->game_screen->players[1].score ? &this->game_screen->players[0] : &this->game_screen->players[1];
+
+    DBG_LOG("The winner is: %s", winner->name);
 }
 
 /**

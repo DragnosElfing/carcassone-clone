@@ -39,7 +39,9 @@ Player Player__construct(SDL_Renderer* renderer, TTF_Font* font, char const* nam
     Player new_player = {
         .highscore = highscore,
         .score = 0U,
-        .is_turn_active = false
+        .has_placed_card = false,
+        .is_turn_active = false,
+        .meeples_at_hand = MAX_MEEPLES
     };
     strcpy(new_player.name, strlen(name) <= 24 ? name : "INVALID");
 
@@ -77,10 +79,14 @@ Player Player__construct(SDL_Renderer* renderer, TTF_Font* font, char const* nam
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderFillRect(renderer, NULL);
 
-        if(handle != NULL) SDL_RenderCopy(renderer, handle, NULL, &(SDL_Rect){0, 0, 200, 80});
-        if(new_player.score_counter != NULL) SDL_RenderCopy(renderer, new_player.score_counter, NULL, &(SDL_Rect){10, 95, 100, 80});
+        if(handle != NULL) SDL_RenderCopy(renderer, handle, NULL, &(SDL_Rect){0, 0, 300, 60});
+        if(new_player.score_counter != NULL) {
+            SDL_RenderCopy(renderer, new_player.score_counter, NULL, 
+                &(SDL_Rect){15, 95, 50, 80});
+        }
         for(size_t m = 0U; m < MAX_MEEPLES; ++m) {
-            SDL_RenderCopy(renderer, new_player.meeples[m].texture, NULL, &(SDL_Rect){10 + 30*m, 200, 64, 64});
+            SDL_RenderCopy(renderer, new_player.meeples[m].texture, NULL, 
+                &(SDL_Rect){10 + 30*m, 200, 64, 64});
         }
 
         SDL_SetRenderTarget(renderer, NULL);

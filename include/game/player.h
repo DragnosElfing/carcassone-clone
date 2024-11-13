@@ -14,15 +14,18 @@ typedef struct {
     char name[24+1];
     unsigned int score;
     unsigned int highscore;
+    bool has_placed_card;
     bool is_turn_active;
 
     Meeple meeples[MAX_MEEPLES];
+    size_t meeples_at_hand;
 
     // Textúrák
     SDL_Texture* score_counter;
     SDL_Texture* stat_panel;
 } Player;
 Player Player__construct(SDL_Renderer*, TTF_Font*, char const*, unsigned int);
+void Player__place_meeple(Player*);
 void Player__toggle_turn_active(Player*);
 void Player__update_score(Player*, unsigned int);
 void Player__destroy(Player*);

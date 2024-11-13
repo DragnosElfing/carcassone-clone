@@ -48,12 +48,12 @@ typedef enum {
 typedef struct {
     ConnectionType connections[4]; // a négy oldal: north, east, south, west
     TileType type;
-    SDL_Point local_coords, global_coords; // bal felső sarok koord
+    SDL_FPoint local_coords, global_coords; // bal felső sarok koord
     unsigned short rotation; // `unsigned int`, mert csak egész foknyi forgatást engedek
     bool rotatable;
 } Tile;
-void Tile__construct(Tile*, TileType, SDL_Point, SDL_Point);
-bool Tile__point_in_tile(Tile*, SDL_Point);
+void Tile__construct(Tile*, TileType, SDL_FPoint, SDL_FPoint);
+bool Tile__point_in_tile(Tile*, SDL_FPoint);
 void Tile__move_by(Tile*, float, float);
 void Tile__rotate(Tile*);
 void Tile__set_rotation(Tile*, unsigned short);
