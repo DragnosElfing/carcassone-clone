@@ -1,4 +1,5 @@
 #include <SDL2/SDL_rect.h>
+#include <SDL2/SDL_render.h>
 #include <SDL2/SDL_scancode.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +13,10 @@
 #include "game/tile.h"
 #include "ui.h"
 #include "app.h"
+
+#ifdef _CRCLONE_DEBUG
+    #include "debug/debugmalloc.h"
+#endif
 
 /**
  * @brief Initicializálja az összes nézetet, SDL és TTF kontextusokat.
@@ -57,7 +62,7 @@ Carcassone* Carcassone__construct(int width, int height, char const* title)
         return NULL;
     }
 
-    new_app->default_font = TTF_OpenFont("res/fonts/Sedan_SC/sedan_sc.ttf", 128);
+    new_app->default_font = TTF_OpenFont("res/fonts/Sedan_SC/sedan_sc.ttf", 48);
     new_app->small_font = TTF_OpenFont("res/fonts/Sedan_SC/sedan_sc.ttf", 36);
     if(new_app->default_font == NULL || new_app->small_font == NULL) {
         SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "Nem sikerült betölteni a fontot!");
@@ -138,7 +143,7 @@ void Carcassone__switch_state(Carcassone* this, AppState new_state)
 }
 
 
-static void remove_last_utf8_char(char *str) {
+static void remove_last_utf8_char(char* str) {
     if(str == NULL) return;
     size_t len = strlen(str);
     if (len == 0) return;
@@ -157,8 +162,24 @@ static void remove_last_utf8_char(char *str) {
             *p = '\0';
             break;
         }
-        p--;
+        --p;
     }
+}
+
+size_t get_utf8_length(char* str)
+{
+    if(str == NULL) return 0U;
+
+    char* p = str;
+    size_t len = 0U;
+    while(*p != '\0') {
+        if ((*p & 0b11000000) != 0b10000000) {
+            ++len;
+        }
+        ++p;
+    }
+
+    return len;
 }
 
 /**
@@ -181,13 +202,11 @@ void Carcassone__handle_input(Carcassone* this)
             if(!(this->state == GAME && !this->game_screen->is_ready)) break;
             if(event.text.text[0] == ' ') break;
 
-            // TODO: count mb characters instead of single byte ones
-            if(strlen(this->game_screen->active_input->prompt.label) < 24) {
+            if(get_utf8_length(this->game_screen->active_input->prompt.label) < 24) {
                 Carcassone__Prompt__edit(this, this->game_screen->active_input, event.text.text, true);
             }
             break;
         case SDL_TEXTEDITING:
-            DBG_LOG("TEXT EDITING EVENT");
             break;
         case SDL_KEYUP:
             if(!(SDL_SCANCODE_RIGHT <= event.key.keysym.scancode && event.key.keysym.scancode <= SDL_SCANCODE_UP)) return;
@@ -202,7 +221,7 @@ void Carcassone__handle_input(Carcassone* this)
                     this->is_running = false;
                     break;
                 case SDLK_BACKSPACE:
-                    if(strlen(this->game_screen->active_input->prompt.label) > 0) {
+                    if(get_utf8_length(this->game_screen->active_input->prompt.label) > 0) {
                         remove_last_utf8_char(this->game_screen->active_input->prompt.label);
                         Carcassone__Prompt__edit(this, this->game_screen->active_input, this->game_screen->active_input->prompt.label, false);
                     }
@@ -254,24 +273,31 @@ void Carcassone__handle_input(Carcassone* this)
                 if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->game_screen->concede_button.global_rect))
                     Carcassone__switch_state(this, MENU);
                 
-                if(this->game_screen->curr_player->has_placed_card) break;
                 for(int y = 0; y < BOARD_SIZE; ++y) {
                     for(int x = 0; x < BOARD_SIZE; ++x) {
                         Tile* curr_tile = &this->game_screen->board[x][y];
-                        if(Tile__point_in_tile(curr_tile, (SDL_FPoint){event.button.x, event.button.y})
-                                && curr_tile->type == EMPTY
-                                && Carcassone__check_surrounding_tiles(this, (SDL_Point){x, y})
-                        ) {
-                            // TODO
-                            SDL_FPoint temp_new_local = {curr_tile->local_coords.x / TILE_SIZE,
-                                curr_tile->local_coords.y / TILE_SIZE};
-                            Tile__construct(curr_tile, this->game_screen->drawn_tile->type,
-                                temp_new_local, this->game_screen->board_offset);
-                            Tile__set_rotation(curr_tile, this->game_screen->drawn_tile->rotation);
+                        if(!this->game_screen->curr_player->has_placed_card) {
+                            if(Tile__point_in_tile(curr_tile, (SDL_FPoint){event.button.x, event.button.y})
+                                    && curr_tile->type == EMPTY
+                                    && Carcassone__check_surrounding_tiles(this, (SDL_Point){x, y})
+                            ) {
+                                // TODO
+                                SDL_FPoint temp_new_local = {curr_tile->local_coords.x / TILE_SIZE,
+                                    curr_tile->local_coords.y / TILE_SIZE};
+                                Tile__construct(curr_tile, this->game_screen->drawn_tile->type,
+                                    temp_new_local, this->game_screen->board_offset);
+                                Tile__set_rotation(curr_tile, this->game_screen->drawn_tile->rotation);
 
-                            this->game_screen->curr_player->has_placed_card = true;
+                                this->game_screen->curr_player->has_placed_card = true;
 
-                            //Carcassone__draw_new(this);
+                                Carcassone__check_scorable_constructs(this);
+                            }
+                        } else if(!this->game_screen->curr_player->has_placed_meeple) { 
+                            if(Tile__point_in_tile(curr_tile, (SDL_FPoint){event.button.x, event.button.y}) 
+                                    && curr_tile->type != EMPTY) {
+                                Player__place_meeple(this->game_screen->curr_player, (SDL_Point){x, y});
+                                this->game_screen->curr_player->has_placed_meeple = true;
+                            }
                         }
                     }
                 }
@@ -294,10 +320,10 @@ void Carcassone__handle_input(Carcassone* this)
  */
 void Carcassone__init_players(Carcassone* this) // TODO
 {
-    this->game_screen->players[0] = Player__construct(this->renderer, this->default_font,
+    this->game_screen->players[0] = Player__construct(this->renderer, this->small_font,
             this->game_screen->player_name_inputs[0].prompt.label, 
             Leaderboard__get_highscore_for(this->lboard_screen->leaderboard, this->game_screen->player_name_inputs[0].prompt.label)); // TODO: NO
-    this->game_screen->players[1] = Player__construct(this->renderer, this->default_font,
+    this->game_screen->players[1] = Player__construct(this->renderer, this->small_font,
             this->game_screen->player_name_inputs[1].prompt.label, 
             Leaderboard__get_highscore_for(this->lboard_screen->leaderboard, this->game_screen->player_name_inputs[1].prompt.label)); // TODO: NO
 
@@ -358,8 +384,7 @@ void Carcassone__init_pile(Carcassone* this)
     }
 
     for(size_t n = 0U; n < PILE_SIZE; ++n) {
-        this->game_screen->card_pile[n] = malloc(sizeof(Tile));
-        Tile__construct(this->game_screen->card_pile[n], pile[n], (SDL_FPoint){0, 0}, (SDL_FPoint){0, 0});
+        this->game_screen->card_pile = CardPile__push(this->game_screen->card_pile, pile[n]);
     }
 
     this->game_screen->pile_index = 0U;
@@ -375,6 +400,8 @@ void Carcassone__init_pile(Carcassone* this)
 void Carcassone__init_board(Carcassone* this)
 {
     // BOARD_SIZE * BOARD_SIZE 2D array
+    // ! debugmalloc falsely claims the code below produces a memory leak
+    // ! it does not, free happens inside Carcassone__Game__destroy() without any issue
     this->game_screen->board = malloc(BOARD_SIZE * sizeof(Tile*));
     for(size_t n = 0U; n < BOARD_SIZE; ++n) {
         this->game_screen->board[n] = malloc(BOARD_SIZE * sizeof(Tile));
@@ -389,8 +416,6 @@ void Carcassone__init_board(Carcassone* this)
     // Kezdőkártya
     Tile__construct(&this->game_screen->board[BOARD_SIZE / 2][BOARD_SIZE / 2], CASTLE_CAP_WALL_ROAD_BY,
         (SDL_FPoint){BOARD_SIZE / 2.0f, BOARD_SIZE / 2.0f}, this->game_screen->board_offset);
-
-    
 }
 
 /**
@@ -467,9 +492,94 @@ void Carcassone__render_drawn_tile(Carcassone* this)
         SDL_RenderCopyEx(this->renderer, this->game_screen->tileset_wrapper.tile_set, &ts_rect,
             &(SDL_Rect){mx - TILE_SIZE / 2, my - TILE_SIZE / 2, TILE_SIZE, TILE_SIZE},
             this->game_screen->drawn_tile->rotation, NULL, SDL_FLIP_NONE);
-    } else if(this->game_screen->curr_player->meeples_at_hand > 0) {
+    } else if(this->game_screen->curr_player->meeples_at_hand > 0 && !this->game_screen->curr_player->has_placed_meeple) {
         SDL_RenderCopy(this->renderer, this->game_screen->curr_player->meeples[0].texture, NULL, 
             &(SDL_Rect){mx - 64 / 2, my - 64 / 2, 64, 64});
+    }
+}
+
+void Carcassone__render_meeples(Carcassone* this)
+{
+    Tile* placed_on = NULL;
+    SDL_Rect rect;
+    for(size_t p = 0U; p < 2; ++p) {
+        for(size_t m = 0U; m < MAX_MEEPLES-this->game_screen->players[p].meeples_at_hand; ++m) {
+            size_t _m = m+this->game_screen->players[p].meeples_at_hand;
+            placed_on = &this->game_screen->board[this->game_screen->players[p].meeples[_m].x][this->game_screen->players[p].meeples[_m].y];
+            rect = (SDL_Rect){
+                p == 0 ? placed_on->global_coords.x + 10*m : placed_on->global_coords.x + TILE_SIZE - 32 - 10*m,
+                p == 0 ? placed_on->global_coords.y : placed_on->global_coords.y + TILE_SIZE - 32,
+                32, 32
+            };
+            SDL_RenderCopy(this->renderer, this->game_screen->curr_player->meeples[0].texture, NULL, &rect);
+        }
+    }
+}
+
+void Carcassone__indicate_possible_placements(Carcassone* this)
+{
+    if(this->game_screen->curr_player->has_placed_card) return;
+    
+    for(int y = 0; y < BOARD_SIZE; ++y) {
+        for(int x = 0; x < BOARD_SIZE; ++x) {
+            Tile* curr_tile = &this->game_screen->board[x][y];
+            if(curr_tile->type != EMPTY) continue;
+
+            if(Carcassone__check_surrounding_tiles(this, (SDL_Point){x, y})) {
+                SDL_SetRenderDrawColor(this->renderer, 20, 240, 100, 255);
+                SDL_RenderFillRect(this->renderer, 
+                &(SDL_Rect){
+                        curr_tile->global_coords.x, curr_tile->global_coords.y, TILE_SIZE, TILE_SIZE}
+                );
+            }
+            
+        }
+    }
+}
+
+void Carcassone__check_scorable_constructs(Carcassone* this)
+{
+    for(int y = 0; y < BOARD_SIZE; ++y) {
+        for(int x = 0; x < BOARD_SIZE; ++x) {
+            Tile* curr_tile = &this->game_screen->board[x][y];
+            if(curr_tile->type == EMPTY) continue;
+
+            if(curr_tile->type == FIELD_CLOISTER_ROAD_S || curr_tile->type == FIELD_CLOISTER_ROAD_NS) {
+                bool finished = true;
+                for(int yrel = y-1; yrel <= y+1; ++yrel) {
+                    for(int xrel = x-1; xrel <= x+1; ++xrel) {
+                        if(yrel < 0 || yrel >= BOARD_SIZE || xrel < 0 || xrel >= BOARD_SIZE) continue;
+                        if(this->game_screen->board[xrel][yrel].type == EMPTY) {
+                            finished = false;
+                            break;
+                        }
+                    }
+
+                    if(!finished) break;
+                }
+
+                if(finished) {
+                    Carcassone__calculate_scores_for_cloister(this, curr_tile);
+                }
+            }
+            
+        }
+    }
+}
+
+// TODO: NO
+void Carcassone__calculate_scores_for_cloister(Carcassone* this, Tile* cloister)
+{
+    Tile* placed_on = NULL;
+    for(size_t p = 0U; p < 2; ++p) {
+        for(size_t m = 0U; m < MAX_MEEPLES-this->game_screen->players[p].meeples_at_hand; ++m) {
+            size_t _m = m+this->game_screen->players[p].meeples_at_hand;
+            placed_on = &this->game_screen->board[this->game_screen->players[p].meeples[_m].x][this->game_screen->players[p].meeples[_m].y];
+            if(placed_on == cloister) {
+                Player__reclaim_meeple(&this->game_screen->players[p], NULL);
+                Player__add_to_score(&this->game_screen->players[p], 3);
+            }
+        }
     }
 }
 
@@ -489,13 +599,6 @@ void Carcassone__render_player_stats(Carcassone* this)
         SDL_RenderCopy(this->renderer, this->game_screen->players[1].stat_panel, NULL, 
             &(SDL_Rect){this->width - 300, 0, 300, 700});
     }
-
-    SDL_SetRenderDrawColor(this->renderer, 255, 0, 0, 255);
-    // if(this->game_screen->players[0].is_turn_active) {
-    //     SDL_RenderDrawRect(this->renderer, &(SDL_Rect){0, 0, 300, 700});
-    // } else if(this->game_screen->players[1].is_turn_active) {
-    //     SDL_RenderDrawRect(this->renderer, &(SDL_Rect){this->width - 300, 0, 300, 700});
-    // }
 }
 
 /**
@@ -532,7 +635,7 @@ void Carcassone__move_board(Carcassone* this, SDL_Scancode key)
 }
 
 /**
- * @brief A splash cím renderelése.
+ * @brief Helyes pozíció ellenőrzése.
  * 
  * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
  * @param tcoords A kapott kártya potenciális helye a táblán.
@@ -588,11 +691,21 @@ bool Carcassone__check_surrounding_tiles(Carcassone* this, SDL_Point tcoords)
  */
 void Carcassone__draw_new(Carcassone* this) // TODO
 {
-    this->game_screen->drawn_tile = this->game_screen->card_pile[this->game_screen->pile_index];
+    TileType next_type;
+    this->game_screen->card_pile = CardPile__pop(this->game_screen->card_pile, &next_type);
+    Tile__construct(this->game_screen->drawn_tile, next_type, (SDL_FPoint){0, 0}, (SDL_FPoint){0, 0});
     ++this->game_screen->pile_index;
 
     if(this->game_screen->curr_player != NULL) {
         this->game_screen->curr_player->has_placed_card = false;
+        this->game_screen->curr_player->has_placed_meeple = false;
+    }
+
+    // TODO: NO
+    if(this->game_screen->curr_player->name == this->game_screen->players[0].name) {
+        this->game_screen->curr_player = &this->game_screen->players[1];
+    } else {
+        this->game_screen->curr_player = &this->game_screen->players[0];
     }
 
     if(this->game_screen->pile_index >= PILE_SIZE) {
@@ -601,6 +714,7 @@ void Carcassone__draw_new(Carcassone* this) // TODO
         Carcassone__switch_state(this, MENU);
     }
 }
+
 
 void Carcassone__show_finish_screen(Carcassone* this)
 {

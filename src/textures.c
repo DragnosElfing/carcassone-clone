@@ -2,6 +2,10 @@
 
 #include "game/tile.h"
 
+#ifdef _CRCLONE_DEBUG
+    #include "debug/debugmalloc.h"
+#endif
+
 TilesetWrapper TilesetWrapper__construct(SDL_Renderer* renderer)
 {
     TilesetWrapper new_tswrapper = {

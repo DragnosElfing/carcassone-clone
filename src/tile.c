@@ -1,10 +1,51 @@
-#include <math.h>
-#include "app.h"
-#include "game/tile.h"
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_log.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
+#include <math.h>
+
+#include "app.h"
+#include "game/tile.h"
+
+#ifdef _CRCLONE_DEBUG
+    #include "debug/debugmalloc.h"
+#endif
+
+CardPile* CardPile__construct(void)
+{
+    CardPile* new_cardpile = malloc(sizeof(CardPile));
+    new_cardpile->card = EMPTY;
+    new_cardpile->next = NULL;
+
+    return new_cardpile;
+}
+
+CardPile* CardPile__pop(CardPile* this, TileType* popped)
+{
+    *popped = this->card;
+    CardPile* new_top = this->next;
+    free(this);
+
+    return new_top;
+}
+
+CardPile* CardPile__push(CardPile* this, TileType new_type)
+{
+    CardPile* new_top = CardPile__construct();
+    new_top->card = new_type;
+    new_top->next = this;
+
+    return new_top;
+}
+
+void CardPile__destroy(CardPile* this)
+{
+    if(this == NULL) return;
+    else {
+        CardPile__destroy(this->next);
+        free(this);
+    }
+}
 
 void Tile__construct(Tile* this, TileType type, SDL_FPoint lcoords, SDL_FPoint offset)
 {
@@ -32,12 +73,13 @@ void Tile__move_by(Tile* this, float mvx, float mvy)
 
 void Tile__rotate(Tile* this)
 {
+    if(this == NULL) return;
     Tile__set_rotation(this, this->rotation + 90);
 }
 
 void Tile__set_rotation(Tile* this, unsigned short new_rotation)
 {
-    if(!this->rotatable) return;
+    if(this == NULL || !this->rotatable) return;
 
     ConnectionType prev_connections[4];
 

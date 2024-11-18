@@ -4,6 +4,10 @@
 
 #include "game/player.h"
 
+#ifdef _CRCLONE_DEBUG
+    #include "debug/debugmalloc.h"
+#endif
+
 Leaderboard* Leaderboard__construct(char const* records_file_path)
 {
     Leaderboard* new_lboard = malloc(sizeof(Leaderboard));
@@ -66,4 +70,5 @@ unsigned int Leaderboard__get_highscore_for(Leaderboard* this, char const* name)
 void Leaderboard__destroy(Leaderboard* this)
 {
     free(this->entries);
+    free(this);
 }

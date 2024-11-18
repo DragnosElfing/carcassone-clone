@@ -11,10 +11,11 @@
 #define MAX_MEEPLES 7
 
 typedef struct {
-    char name[24+1];
+    char name[(24+1)*sizeof(wchar_t)];
     unsigned int score;
     unsigned int highscore;
     bool has_placed_card;
+    bool has_placed_meeple;
     bool is_turn_active;
 
     Meeple meeples[MAX_MEEPLES];
@@ -24,10 +25,11 @@ typedef struct {
     SDL_Texture* score_counter;
     SDL_Texture* stat_panel;
 } Player;
-Player Player__construct(SDL_Renderer*, TTF_Font*, char const*, unsigned int);
-void Player__place_meeple(Player*);
+Player Player__construct(SDL_Renderer*, TTF_Font*, char*, unsigned int);
+void Player__place_meeple(Player*, SDL_Point);
+void Player__reclaim_meeple(Player*, Meeple*);
 void Player__toggle_turn_active(Player*);
-void Player__update_score(Player*, unsigned int);
+void Player__add_to_score(Player*, unsigned int);
 void Player__destroy(Player*);
 
 typedef struct {

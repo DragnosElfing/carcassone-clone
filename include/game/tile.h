@@ -7,6 +7,7 @@
 
 #define TILE_SIZE 100
 #define TILE_SIZE_SRC 64
+#define PILE_SIZE 71
 
 typedef enum {
     NONE = 0U,
@@ -58,6 +59,15 @@ void Tile__move_by(Tile*, float, float);
 void Tile__rotate(Tile*);
 void Tile__set_rotation(Tile*, unsigned short);
 void Tile__set_type(Tile*, TileType, unsigned short);
+
+typedef struct CardPile {
+    TileType card;
+    struct CardPile* next;
+} CardPile;
+CardPile* CardPile__construct(void);
+CardPile* CardPile__pop(CardPile*, TileType*);
+CardPile* CardPile__push(CardPile*, TileType);
+void CardPile__destroy(CardPile*);
 
 typedef struct {
     SDL_Texture* tile_set;

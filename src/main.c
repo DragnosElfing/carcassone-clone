@@ -1,8 +1,4 @@
 #include <SDL2/SDL_log.h>
-#ifdef _CRCLONE_DEBUG
-    #include "debug/debugmalloc.h"
-#endif
-
 #include "app.h"
 
 /**

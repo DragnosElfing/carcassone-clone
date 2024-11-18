@@ -11,6 +11,10 @@
 #include "ui.h"
 #include "app.h"
 
+#ifdef _CRCLONE_DEBUG
+    #include "debug/debugmalloc.h"
+#endif
+
 void Carcassone__Menu__construct(Carcassone* this)
 {
     this->menu_screen = malloc(sizeof(MenuScreen));
@@ -25,7 +29,6 @@ void Carcassone__Menu__construct(Carcassone* this)
     }
     SDL_SetRenderDrawBlendMode(this->renderer, SDL_BLENDMODE_BLEND);
 
-    // TODO: rel coords, viewport
     this->menu_screen->button_container = (SDL_Rect){this->width/2 - 400, 250, 800, 600};
 
     // Create buttons
@@ -35,7 +38,7 @@ void Carcassone__Menu__construct(Carcassone* this)
         200, 60
     };
     this->menu_screen->start_button = 
-        Carcassone__Button__construct(this, "START", start_button_rect, (SDL_Color){COLOR_BLUE}, (SDL_Color){COLOR_WHITE});
+        Carcassone__Button__construct(this, this->default_font, "START", start_button_rect, (SDL_Color){COLOR_BLUE}, (SDL_Color){COLOR_WHITE}, true);
 
     SDL_Rect lboard_button_rect = {
         this->menu_screen->button_container.x + this->menu_screen->button_container.w / 2 - 200,
@@ -43,7 +46,7 @@ void Carcassone__Menu__construct(Carcassone* this)
         400, 60
     };
     this->menu_screen->lboard_button = 
-        Carcassone__Button__construct(this, "DICSŐSÉGLISTA", lboard_button_rect, (SDL_Color){COLOR_BLUE}, (SDL_Color){COLOR_WHITE});
+        Carcassone__Button__construct(this, this->default_font, "DICSŐSÉGLISTA", lboard_button_rect, (SDL_Color){COLOR_BLUE}, (SDL_Color){COLOR_WHITE}, true);
 }
 void Carcassone__Menu__destroy(Carcassone* this)
 {
@@ -52,6 +55,23 @@ void Carcassone__Menu__destroy(Carcassone* this)
     Carcassone__Button__destroy(this, &this->menu_screen->lboard_button);
     free(this->menu_screen);
 }
+void Carcassone__Menu__render(Carcassone* this)
+{
+    SDL_RenderClear(this->renderer);
+    SDL_RenderCopy(this->renderer, this->menu_screen->background, NULL, NULL);
+
+    SDL_SetRenderDrawColor(this->renderer, 255, 165, 105, 155);
+    SDL_RenderFillRectF(this->renderer, NULL);
+
+    Carcassone__Button__render(this, &this->menu_screen->start_button);
+    Carcassone__Button__render(this, &this->menu_screen->lboard_button);
+
+    SDL_RenderCopy(this->renderer, this->splash_title, NULL,
+        &(SDL_Rect){this->width/2 - 400, 0, 800, 240});
+
+    SDL_RenderPresent(this->renderer);
+}
+
 void Carcassone__Lboard__construct(Carcassone* this)
 {
     this->lboard_screen = malloc(sizeof(LeaderboardScreen));
@@ -59,8 +79,8 @@ void Carcassone__Lboard__construct(Carcassone* this)
     this->lboard_screen->leaderboard = Leaderboard__construct("res/data/records.dat");
 
     this->lboard_screen->back_button = 
-        Carcassone__Button__construct(this, "VISSZA", (SDL_Rect){this->width - 150, 10, 140, 50}, (SDL_Color){COLOR_WHITE}, 
-            (SDL_Color){0, 0, 0, 255});
+        Carcassone__Button__construct(this, this->small_font, "VISSZA", (SDL_Rect){this->width - 150, 10, 140, 50}, 
+        (SDL_Color){COLOR_WHITE}, (SDL_Color){0, 0, 0, 255}, true);
 
     // Texture for the leaderboard entries
     this->lboard_screen->list_texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
@@ -73,19 +93,18 @@ void Carcassone__Lboard__construct(Carcassone* this)
         int w, h;
         for(size_t place = 0U; place < MIN(5, this->lboard_screen->leaderboard->entries_size); ++place) {
             char* curr_name = this->lboard_screen->leaderboard->entries[place].name;
-            TTF_SizeUTF8(this->default_font, curr_name, &w, &h);
+            TTF_SizeUTF8(this->small_font, curr_name, &w, &h);
             SDL_RenderCopy(this->renderer, SDL_CreateTextureFromSurface(
-                this->renderer, TTF_RenderUTF8_Blended(this->default_font, this->lboard_screen->leaderboard->entries[place].name,
+                this->renderer, TTF_RenderUTF8_Blended(this->small_font, this->lboard_screen->leaderboard->entries[place].name,
                 (SDL_Color){COLOR_WHITE})), 
-                NULL, &(SDL_Rect){0, 100 * place, 
-                    (int)(0.4f * w), 
-                    (int)(0.4f * h)});
+                NULL, &(SDL_Rect){0, 160 * place, w, h});
 
             sprintf(score_string, "%u", this->lboard_screen->leaderboard->entries[place].highscore);
+            TTF_SizeUTF8(this->small_font, score_string, &w, &h);
             SDL_RenderCopy(this->renderer, SDL_CreateTextureFromSurface(
                 this->renderer, TTF_RenderUTF8_Blended(this->default_font, score_string,
-                (SDL_Color){COLOR_WHITE})), NULL, &(SDL_Rect){900, 100 * place, 
-                    50 / (this->lboard_screen->leaderboard->entries[place].highscore < 10 ? 2 : 1), 80});
+                (SDL_Color){COLOR_WHITE})), NULL, &(SDL_Rect){0, 160 * place + h, 
+                    w, h});
         }
     } else {
         int w, h;
@@ -107,23 +126,6 @@ void Carcassone__Lboard__destroy(Carcassone* this)
     free(this->lboard_screen);
 }
 
-void Carcassone__Menu__render(Carcassone* this)
-{
-    SDL_RenderClear(this->renderer);
-    SDL_RenderCopy(this->renderer, this->menu_screen->background, NULL, NULL);
-
-    SDL_SetRenderDrawColor(this->renderer, 255, 165, 105, 155);
-    SDL_RenderFillRectF(this->renderer, NULL);
-
-    Carcassone__Button__render(this, &this->menu_screen->start_button);
-    Carcassone__Button__render(this, &this->menu_screen->lboard_button);
-
-    SDL_RenderCopy(this->renderer, this->splash_title, NULL,
-        &(SDL_Rect){this->width/2 - 400, 0, 800, 240});
-
-    SDL_RenderPresent(this->renderer);
-}
-
 void Carcassone__Lboard__render(Carcassone* this)
 {
     SDL_RenderClear(this->renderer);
@@ -134,7 +136,7 @@ void Carcassone__Lboard__render(Carcassone* this)
         &(SDL_Rect){this->width/2 - 400, 0, 800, 240});
 
     SDL_RenderCopy(this->renderer, this->lboard_screen->list_texture, NULL,
-        &(SDL_Rect){this->width/2 - 500, 300, 1000, 700});
+        &(SDL_Rect){this->width/2 - 500, 250, 1000, 700});
 
     SDL_SetRenderDrawColor(this->renderer, COLOR_BLUE);
     SDL_RenderPresent(this->renderer);
@@ -149,6 +151,8 @@ void Carcassone__Game__construct(Carcassone* this)
     this->game_screen->curr_player = NULL;
     this->game_screen->pile_index = 0U;
     this->game_screen->is_ready = false;
+    this->game_screen->drawn_tile = malloc(sizeof(Tile));
+    this->game_screen->card_pile = CardPile__construct();
     for(size_t k = 0U; k < 4; ++k) {
         this->game_screen->held_arrow_keys[k] = 0;
     }
@@ -179,36 +183,30 @@ void Carcassone__Game__construct(Carcassone* this)
     Carcassone__draw_new(this);
 
     int max_width, height;
-    TTF_SizeUTF8(this->small_font, "WWWWWWWWWWWWWWWWWWWWWWWW", &max_width, &height);
+    TTF_SizeUTF8(this->small_font, "WWWWWWWWWWWWWWWWWWWWWWWW", &max_width, NULL);
     int default_width;
-    TTF_SizeUTF8(this->small_font, "Játékos1", &default_width, NULL);
+    TTF_SizeUTF8(this->small_font, "Játékos1", &default_width, &height);
 
-    SDL_Rect input1_rect = {
-        this->width / 2 - default_width / 2, this->height / 4 - 100, default_width, height
-    };
-    SDL_Rect input2_rect = {
-        this->width / 2 - default_width / 2, this->height / 4 + 150, default_width, height
-    };
     SDL_Rect input1_max_rect = {
-        this->width / 2 - max_width / 2, this->height / 4 - 100, max_width, height
+        this->width / 2 - max_width / 2, this->height / 4 - 100, max_width, height + 10
     };
     SDL_Rect input2_max_rect = {
-        this->width / 2 - max_width / 2, this->height / 4 + 150, max_width, height
+        this->width / 2 - max_width / 2, this->height / 4 + 150, max_width, height + 10
     };
 
     this->game_screen->player_name_inputs[0] = 
-        Carcassone__Prompt__construct(this, "Játékos1", input1_max_rect, (SDL_Color){COLOR_WHITE}, (SDL_Color){0, 0, 0, 255});
+        Carcassone__Prompt__construct(this, this->small_font, "Játékos_1", input1_max_rect, (SDL_Color){COLOR_WHITE}, (SDL_Color){0, 0, 0, 255});
     this->game_screen->player_name_inputs[1] = 
-        Carcassone__Prompt__construct(this, "Játékos2", input2_max_rect, (SDL_Color){COLOR_WHITE}, (SDL_Color){0, 0, 0, 255});
+        Carcassone__Prompt__construct(this, this->small_font, "Játékos_2", input2_max_rect, (SDL_Color){COLOR_WHITE}, (SDL_Color){0, 0, 0, 255});
     this->game_screen->ready_button = 
-        Carcassone__Button__construct(this, "START", (SDL_Rect){10, this->height - 10 - 60, 150, 60}, (SDL_Color){COLOR_WHITE}, 
-            (SDL_Color){0, 0, 0, 255});
+        Carcassone__Button__construct(this, this->small_font, "START", (SDL_Rect){10, this->height - 10 - 60, 150, 60}, (SDL_Color){COLOR_WHITE}, 
+            (SDL_Color){0, 0, 0, 255}, true);
     this->game_screen->concede_button =
-        Carcassone__Button__construct(this, "FELAD", (SDL_Rect){10, this->height - 10 - 60, 150, 60}, (SDL_Color){COLOR_WHITE}, 
-            (SDL_Color){140, 0, 0, 255});
+        Carcassone__Button__construct(this, this->small_font, "FELAD", (SDL_Rect){10, this->height - 10 - 60, 150, 60}, (SDL_Color){COLOR_WHITE}, 
+            (SDL_Color){140, 0, 0, 255}, true);
     this->game_screen->end_turn_button =
-        Carcassone__Button__construct(this, "KÖR VÉGE", (SDL_Rect){this->width - 10 - 150, this->height - 10 - 60, 150, 60}, (SDL_Color){COLOR_WHITE}, 
-            (SDL_Color){0, 0, 140, 255});
+        Carcassone__Button__construct(this, this->small_font, "KÖR VÉGE", (SDL_Rect){this->width - 10 - 200, this->height - 10 - 60, 200, 60}, (SDL_Color){COLOR_WHITE}, 
+            (SDL_Color){0, 0, 140, 255}, true);
 
     this->game_screen->active_input = &this->game_screen->player_name_inputs[0];
 }
@@ -226,13 +224,14 @@ void Carcassone__Game__destroy(Carcassone* this)
         }
         free(this->game_screen->board);
     }
-    for(size_t n = 0U; n < PILE_SIZE; ++n) {
-        free(this->game_screen->card_pile[n]);
-    }
+    CardPile__destroy(this->game_screen->card_pile);
+    free(this->game_screen->drawn_tile);
 
     Carcassone__Button__destroy(this, &this->game_screen->ready_button);
     Carcassone__Button__destroy(this, &this->game_screen->concede_button);
     Carcassone__Button__destroy(this, &this->game_screen->end_turn_button);
+    Carcassone__Prompt__destroy(this, &this->game_screen->player_name_inputs[0]);
+    Carcassone__Prompt__destroy(this, &this->game_screen->player_name_inputs[1]);
 
     TilesetWrapper__destroy(&this->game_screen->tileset_wrapper);
     free(this->game_screen);
@@ -254,6 +253,8 @@ void Carcassone__Game__render(Carcassone* this)
         }
     } else {
         Carcassone__render_board(this);
+        Carcassone__indicate_possible_placements(this);
+        Carcassone__render_meeples(this);
         Carcassone__render_splash_title(this);
         Carcassone__render_player_stats(this);
         Carcassone__render_drawn_tile(this);

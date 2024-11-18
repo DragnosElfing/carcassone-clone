@@ -58,6 +58,8 @@ void Carcassone__render_board(Carcassone*);
 void Carcassone__render_splash_title(Carcassone*);
 void Carcassone__render_drawn_tile(Carcassone*);
 void Carcassone__render_player_stats(Carcassone*);
+void Carcassone__render_meeples(Carcassone*);
+void Carcassone__indicate_possible_placements(Carcassone*);
 void Carcassone__init_players(Carcassone*);
 void Carcassone__init_pile(Carcassone*);
 void Carcassone__init_board(Carcassone*);
@@ -65,16 +67,19 @@ void Carcassone__init_counter(Carcassone*);
 void Carcassone__move_board(Carcassone*, SDL_Scancode);
 void Carcassone__draw_new(Carcassone*);
 bool Carcassone__check_surrounding_tiles(Carcassone*, SDL_Point);
+void Carcassone__check_scorable_constructs(Carcassone*);
+void Carcassone__calculate_scores_for_cloister(Carcassone*, Tile*);
 void Carcassone__show_finish_screen(Carcassone*);
-Button Carcassone__Button__construct(Carcassone*, char*, SDL_Rect, SDL_Color, SDL_Color);
+Button Carcassone__Button__construct(Carcassone*, TTF_Font*, char*, SDL_Rect, SDL_Color, SDL_Color, bool);
 bool Carcassone__Button__hover(Carcassone*, Button*, SDL_Point);
 void Carcassone__Button__render(Carcassone*, Button*);
 void Carcassone__Button__destroy(Carcassone*, Button*);
-Prompt Carcassone__Prompt__construct(Carcassone*, char*, SDL_Rect, SDL_Color, SDL_Color);
+Prompt Carcassone__Prompt__construct(Carcassone*, TTF_Font*, char*, SDL_Rect, SDL_Color, SDL_Color);
 void Carcassone__Prompt__edit(Carcassone*, Prompt*, char*, bool);
 void Carcassone__Prompt__render(Carcassone*, Prompt*);
 void Carcassone__Prompt__destroy(Carcassone*, Prompt*);
 
 //static void Carcassone__render_text_to(Carcassone*, SDL_Texture*, char const*);
+size_t get_utf8_length(char*);
 
 #endif

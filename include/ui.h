@@ -8,15 +8,15 @@
 #include "game/tile.h"
 #include "game/player.h"
 
-#define PILE_SIZE 71
 #define BOARD_SIZE 10
 
 typedef struct
 {
-    SDL_Rect label_rect, global_rect;
+    SDL_Rect label_rect, local_rect, global_rect;
     SDL_Color bg_color;
     char* label;
     SDL_Texture* label_texture;
+    TTF_Font* used_font;
 } Button;
 
 typedef struct
@@ -47,7 +47,7 @@ typedef struct
     
     Tile** board;
     Tile* drawn_tile;
-    Tile* card_pile[PILE_SIZE];
+    CardPile* card_pile;
     size_t pile_index;
     
     Player players[2];
