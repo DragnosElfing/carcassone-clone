@@ -1,0 +1,12 @@
+<map id="include/app.h" name="include/app.h">
+<area shape="rect" id="node1" title=" " alt="" coords="420,5,519,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,80,139,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="240,304,315,331"/>
+<area shape="rect" id="node4" title=" " alt="" coords="605,304,701,331"/>
+<area shape="rect" id="node5" title=" " alt="" coords="741,229,856,256"/>
+<area shape="rect" id="node6" href="$tile_8h.html" title=" " alt="" coords="214,155,301,181"/>
+<area shape="rect" id="node7" href="$player_8h.html" title=" " alt="" coords="477,155,579,181"/>
+<area shape="rect" id="node10" href="$ui_8h.html" title=" " alt="" coords="448,80,491,107"/>
+<area shape="rect" id="node8" title=" " alt="" coords="552,229,616,256"/>
+<area shape="rect" id="node9" href="$meeple_8h.html" title=" " alt="" coords="417,229,527,256"/>
+</map>

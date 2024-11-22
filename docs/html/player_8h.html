@@ -1,0 +1,584 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.4"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Carcassone Clone: include/game/player.h fájlreferencia</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">Carcassone Clone
+   </div>
+   <div id="projectbrief">Prog1 nagy HF.</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Készítette Doxygen 1.9.4 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search",'Keresés','.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Keresés');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('player_8h.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">Adatszerkezetek</a> &#124;
+<a href="#define-members">Makródefiníciók</a> &#124;
+<a href="#func-members">Függvények</a>  </div>
+  <div class="headertitle"><div class="title">player.h fájlreferencia</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;stdbool.h&gt;</code><br />
+<code>#include &lt;SDL2/SDL.h&gt;</code><br />
+<code>#include &lt;SDL2/SDL_ttf.h&gt;</code><br />
+<code>#include &quot;<a class="el" href="meeple_8h_source.html">game/meeple.h</a>&quot;</code><br />
+</div><div class="textblock"><div class="dynheader">
+A player.h definíciós fájl függési gráfja:</div>
+<div class="dyncontent">
+<div class="center"><img src="player_8h__incl.png" border="0" usemap="#ainclude_2game_2player_8h" alt=""/></div>
+<map name="ainclude_2game_2player_8h" id="ainclude_2game_2player_8h">
+<area shape="rect" title=" " alt="" coords="126,5,274,32"/>
+<area shape="rect" title=" " alt="" coords="5,80,69,107"/>
+<area shape="rect" title=" " alt="" coords="116,155,191,181"/>
+<area shape="rect" title=" " alt="" coords="299,155,395,181"/>
+<area shape="rect" title=" " alt="" coords="280,80,395,107"/>
+<area shape="rect" href="meeple_8h.html" title=" " alt="" coords="145,80,255,107"/>
+</map>
+</div>
+</div><div class="textblock"><div class="dynheader">
+Ez az ábra azt mutatja, hogy mely fájlok ágyazzák be közvetve vagy közvetlenül ezt a fájlt:</div>
+<div class="dyncontent">
+<div class="center"><img src="player_8h__dep__incl.png" border="0" usemap="#ainclude_2game_2player_8hdep" alt=""/></div>
+<map name="ainclude_2game_2player_8hdep" id="ainclude_2game_2player_8hdep">
+<area shape="rect" title=" " alt="" coords="472,5,620,32"/>
+<area shape="rect" href="app_8h.html" title=" " alt="" coords="451,155,550,181"/>
+<area shape="rect" href="app_8c.html" title=" " alt="" coords="657,229,733,256"/>
+<area shape="rect" href="leaderboard_8c.html" title=" " alt="" coords="5,229,167,256"/>
+<area shape="rect" href="players_8c.html" title=" " alt="" coords="191,229,327,256"/>
+<area shape="rect" href="screens_8c.html" title=" " alt="" coords="758,229,873,256"/>
+<area shape="rect" href="ui_8h.html" title=" " alt="" coords="543,80,631,107"/>
+<area shape="rect" href="main_8c.html" title=" " alt="" coords="351,229,434,256"/>
+<area shape="rect" href="tile_8c.html" title=" " alt="" coords="458,229,530,256"/>
+<area shape="rect" href="ui_8c.html" title=" " alt="" coords="555,229,633,256"/>
+</map>
+</div>
+</div>
+<p><a href="player_8h_source.html">Ugrás a fájl forráskódjához.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Adatszerkezetek</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structPlayer.html">Player</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structLeaderboardEntry.html">LeaderboardEntry</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structLeaderboard.html">Leaderboard</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
+Makródefiníciók</h2></td></tr>
+<tr class="memitem:a94212aa4ac63639d8d60d17e5aaea877"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="player_8h.html#a94212aa4ac63639d8d60d17e5aaea877">MAX_MEEPLES</a>&#160;&#160;&#160;7</td></tr>
+<tr class="separator:a94212aa4ac63639d8d60d17e5aaea877"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a200d0890fcb893a404d39150d9ac8082"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="player_8h.html#a200d0890fcb893a404d39150d9ac8082">MAX_PLAYER_NAME_LEN</a>&#160;&#160;&#160;24</td></tr>
+<tr class="separator:a200d0890fcb893a404d39150d9ac8082"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Függvények</h2></td></tr>
+<tr class="memitem:abb1e98a113a6b613a02ff235c5555585"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPlayer.html">Player</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="player_8h.html#abb1e98a113a6b613a02ff235c5555585">Player__construct</a> (SDL_Renderer *, TTF_Font *, char *)</td></tr>
+<tr class="separator:abb1e98a113a6b613a02ff235c5555585"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a929507f7d2e420e5f6a13d85157b296f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="player_8h.html#a929507f7d2e420e5f6a13d85157b296f">Player__place_meeple</a> (<a class="el" href="structPlayer.html">Player</a> *, SDL_Point)</td></tr>
+<tr class="separator:a929507f7d2e420e5f6a13d85157b296f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae4b02dc1bf87dfed17ded1c6a63e2e9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="player_8h.html#aae4b02dc1bf87dfed17ded1c6a63e2e9">Player__reclaim_meeple</a> (<a class="el" href="structPlayer.html">Player</a> *, <a class="el" href="structMeeple.html">Meeple</a> *)</td></tr>
+<tr class="separator:aae4b02dc1bf87dfed17ded1c6a63e2e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e5b24211921961498efad2f4574f6a2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="player_8h.html#a9e5b24211921961498efad2f4574f6a2">Player__render</a> (<a class="el" href="structPlayer.html">Player</a> *, SDL_Renderer *, TTF_Font *)</td></tr>
+<tr class="separator:a9e5b24211921961498efad2f4574f6a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38ade69739b5e67bdd691c905fc35a33"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="player_8h.html#a38ade69739b5e67bdd691c905fc35a33">Player__toggle_turn_active</a> (<a class="el" href="structPlayer.html">Player</a> *)</td></tr>
+<tr class="separator:a38ade69739b5e67bdd691c905fc35a33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e102f4559babaa466be91ce1a128cc1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="player_8h.html#a9e102f4559babaa466be91ce1a128cc1">Player__add_to_score</a> (<a class="el" href="structPlayer.html">Player</a> *, SDL_Renderer *, TTF_Font *, unsigned int)</td></tr>
+<tr class="separator:a9e102f4559babaa466be91ce1a128cc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f7fcf1edd8f6d6b3d198e44e9e289e8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="player_8h.html#a7f7fcf1edd8f6d6b3d198e44e9e289e8">Player__destroy</a> (<a class="el" href="structPlayer.html">Player</a> *)</td></tr>
+<tr class="separator:a7f7fcf1edd8f6d6b3d198e44e9e289e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b1d87fde365ed949b468901324dcc70"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structLeaderboard.html">Leaderboard</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="player_8h.html#a7b1d87fde365ed949b468901324dcc70">Leaderboard__construct</a> (char const *)</td></tr>
+<tr class="separator:a7b1d87fde365ed949b468901324dcc70"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb2ac75114b4e6938e784d41c99aefa7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="player_8h.html#acb2ac75114b4e6938e784d41c99aefa7">Leaderboard__destroy</a> (<a class="el" href="structLeaderboard.html">Leaderboard</a> *)</td></tr>
+<tr class="separator:acb2ac75114b4e6938e784d41c99aefa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae35f89870a374f0147ddaa5523d90eb1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="player_8h.html#ae35f89870a374f0147ddaa5523d90eb1">Leaderboard__sort</a> (<a class="el" href="structLeaderboard.html">Leaderboard</a> *)</td></tr>
+<tr class="separator:ae35f89870a374f0147ddaa5523d90eb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c1cb4522c441cc9d9b436d3e5abbae2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="player_8h.html#a1c1cb4522c441cc9d9b436d3e5abbae2">Leaderboard__load</a> (<a class="el" href="structLeaderboard.html">Leaderboard</a> *, char const *)</td></tr>
+<tr class="separator:a1c1cb4522c441cc9d9b436d3e5abbae2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5775a4f9f71245b998f29f07e32035a1"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="player_8h.html#a5775a4f9f71245b998f29f07e32035a1">Leaderboard__get_highscore_for</a> (<a class="el" href="structLeaderboard.html">Leaderboard</a> *, char const *)</td></tr>
+<tr class="separator:a5775a4f9f71245b998f29f07e32035a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c46669e6bce29927b0be7caef1ba08f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="player_8h.html#a1c46669e6bce29927b0be7caef1ba08f">Leaderboard__insert_new</a> (<a class="el" href="structLeaderboard.html">Leaderboard</a> *, <a class="el" href="structPlayer.html">Player</a> *)</td></tr>
+<tr class="separator:a1c46669e6bce29927b0be7caef1ba08f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Makródefiníciók dokumentációja</h2>
+<a id="a94212aa4ac63639d8d60d17e5aaea877" name="a94212aa4ac63639d8d60d17e5aaea877"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94212aa4ac63639d8d60d17e5aaea877">&#9670;&nbsp;</a></span>MAX_MEEPLES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MAX_MEEPLES&#160;&#160;&#160;7</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definíció a(z) <a class="el" href="player_8h_source.html">player.h</a> fájl <a class="el" href="player_8h_source.html#l00012">12</a>. sorában.</p>
+
+</div>
+</div>
+<a id="a200d0890fcb893a404d39150d9ac8082" name="a200d0890fcb893a404d39150d9ac8082"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a200d0890fcb893a404d39150d9ac8082">&#9670;&nbsp;</a></span>MAX_PLAYER_NAME_LEN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MAX_PLAYER_NAME_LEN&#160;&#160;&#160;24</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definíció a(z) <a class="el" href="player_8h_source.html">player.h</a> fájl <a class="el" href="player_8h_source.html#l00014">14</a>. sorában.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Függvények dokumentációja</h2>
+<a id="a7b1d87fde365ed949b468901324dcc70" name="a7b1d87fde365ed949b468901324dcc70"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b1d87fde365ed949b468901324dcc70">&#9670;&nbsp;</a></span>Leaderboard__construct()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structLeaderboard.html">Leaderboard</a> * Leaderboard__construct </td>
+          <td>(</td>
+          <td class="paramtype">char const *&#160;</td>
+          <td class="paramname"><em>records_file_path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definíció a(z) <a class="el" href="leaderboard_8c_source.html">leaderboard.c</a> fájl <a class="el" href="leaderboard_8c_source.html#l00012">12</a>. sorában.</p>
+
+</div>
+</div>
+<a id="acb2ac75114b4e6938e784d41c99aefa7" name="acb2ac75114b4e6938e784d41c99aefa7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb2ac75114b4e6938e784d41c99aefa7">&#9670;&nbsp;</a></span>Leaderboard__destroy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Leaderboard__destroy </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structLeaderboard.html">Leaderboard</a> *&#160;</td>
+          <td class="paramname"><em>this</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definíció a(z) <a class="el" href="leaderboard_8c_source.html">leaderboard.c</a> fájl <a class="el" href="leaderboard_8c_source.html#l00022">22</a>. sorában.</p>
+
+</div>
+</div>
+<a id="a5775a4f9f71245b998f29f07e32035a1" name="a5775a4f9f71245b998f29f07e32035a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5775a4f9f71245b998f29f07e32035a1">&#9670;&nbsp;</a></span>Leaderboard__get_highscore_for()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int Leaderboard__get_highscore_for </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structLeaderboard.html">Leaderboard</a> *&#160;</td>
+          <td class="paramname"><em>this</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char const *&#160;</td>
+          <td class="paramname"><em>name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definíció a(z) <a class="el" href="leaderboard_8c_source.html">leaderboard.c</a> fájl <a class="el" href="leaderboard_8c_source.html#l00074">74</a>. sorában.</p>
+
+</div>
+</div>
+<a id="a1c46669e6bce29927b0be7caef1ba08f" name="a1c46669e6bce29927b0be7caef1ba08f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c46669e6bce29927b0be7caef1ba08f">&#9670;&nbsp;</a></span>Leaderboard__insert_new()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Leaderboard__insert_new </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structLeaderboard.html">Leaderboard</a> *&#160;</td>
+          <td class="paramname"><em>this</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structPlayer.html">Player</a> *&#160;</td>
+          <td class="paramname"><em>new</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definíció a(z) <a class="el" href="leaderboard_8c_source.html">leaderboard.c</a> fájl <a class="el" href="leaderboard_8c_source.html#l00085">85</a>. sorában.</p>
+
+</div>
+</div>
+<a id="a1c1cb4522c441cc9d9b436d3e5abbae2" name="a1c1cb4522c441cc9d9b436d3e5abbae2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c1cb4522c441cc9d9b436d3e5abbae2">&#9670;&nbsp;</a></span>Leaderboard__load()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Leaderboard__load </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structLeaderboard.html">Leaderboard</a> *&#160;</td>
+          <td class="paramname"><em>this</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char const *&#160;</td>
+          <td class="paramname"><em>records_file_path</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definíció a(z) <a class="el" href="leaderboard_8c_source.html">leaderboard.c</a> fájl <a class="el" href="leaderboard_8c_source.html#l00028">28</a>. sorában.</p>
+
+</div>
+</div>
+<a id="ae35f89870a374f0147ddaa5523d90eb1" name="ae35f89870a374f0147ddaa5523d90eb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae35f89870a374f0147ddaa5523d90eb1">&#9670;&nbsp;</a></span>Leaderboard__sort()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Leaderboard__sort </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structLeaderboard.html">Leaderboard</a> *&#160;</td>
+          <td class="paramname"><em>this</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definíció a(z) <a class="el" href="leaderboard_8c_source.html">leaderboard.c</a> fájl <a class="el" href="leaderboard_8c_source.html#l00069">69</a>. sorában.</p>
+
+</div>
+</div>
+<a id="a9e102f4559babaa466be91ce1a128cc1" name="a9e102f4559babaa466be91ce1a128cc1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e102f4559babaa466be91ce1a128cc1">&#9670;&nbsp;</a></span>Player__add_to_score()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Player__add_to_score </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structPlayer.html">Player</a> *&#160;</td>
+          <td class="paramname"><em>this</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SDL_Renderer *&#160;</td>
+          <td class="paramname"><em>renderer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TTF_Font *&#160;</td>
+          <td class="paramname"><em>font</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>add</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definíció a(z) <a class="el" href="players_8c_source.html">players.c</a> fájl <a class="el" href="players_8c_source.html#l00161">161</a>. sorában.</p>
+
+</div>
+</div>
+<a id="abb1e98a113a6b613a02ff235c5555585" name="abb1e98a113a6b613a02ff235c5555585"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb1e98a113a6b613a02ff235c5555585">&#9670;&nbsp;</a></span>Player__construct()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structPlayer.html">Player</a> Player__construct </td>
+          <td>(</td>
+          <td class="paramtype">SDL_Renderer *&#160;</td>
+          <td class="paramname"><em>renderer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TTF_Font *&#160;</td>
+          <td class="paramname"><em>font</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definíció a(z) <a class="el" href="players_8c_source.html">players.c</a> fájl <a class="el" href="players_8c_source.html#l00041">41</a>. sorában.</p>
+
+</div>
+</div>
+<a id="a7f7fcf1edd8f6d6b3d198e44e9e289e8" name="a7f7fcf1edd8f6d6b3d198e44e9e289e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f7fcf1edd8f6d6b3d198e44e9e289e8">&#9670;&nbsp;</a></span>Player__destroy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Player__destroy </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structPlayer.html">Player</a> *&#160;</td>
+          <td class="paramname"><em>this</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definíció a(z) <a class="el" href="players_8c_source.html">players.c</a> fájl <a class="el" href="players_8c_source.html#l00168">168</a>. sorában.</p>
+
+</div>
+</div>
+<a id="a929507f7d2e420e5f6a13d85157b296f" name="a929507f7d2e420e5f6a13d85157b296f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a929507f7d2e420e5f6a13d85157b296f">&#9670;&nbsp;</a></span>Player__place_meeple()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Player__place_meeple </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structPlayer.html">Player</a> *&#160;</td>
+          <td class="paramname"><em>this</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SDL_Point&#160;</td>
+          <td class="paramname"><em>tile_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definíció a(z) <a class="el" href="players_8c_source.html">players.c</a> fájl <a class="el" href="players_8c_source.html#l00127">127</a>. sorában.</p>
+
+</div>
+</div>
+<a id="aae4b02dc1bf87dfed17ded1c6a63e2e9" name="aae4b02dc1bf87dfed17ded1c6a63e2e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae4b02dc1bf87dfed17ded1c6a63e2e9">&#9670;&nbsp;</a></span>Player__reclaim_meeple()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Player__reclaim_meeple </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structPlayer.html">Player</a> *&#160;</td>
+          <td class="paramname"><em>this</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structMeeple.html">Meeple</a> *&#160;</td>
+          <td class="paramname"><em>to_reclaim</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definíció a(z) <a class="el" href="players_8c_source.html">players.c</a> fájl <a class="el" href="players_8c_source.html#l00148">148</a>. sorában.</p>
+
+</div>
+</div>
+<a id="a9e5b24211921961498efad2f4574f6a2" name="a9e5b24211921961498efad2f4574f6a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e5b24211921961498efad2f4574f6a2">&#9670;&nbsp;</a></span>Player__render()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Player__render </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structPlayer.html">Player</a> *&#160;</td>
+          <td class="paramname"><em>this</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SDL_Renderer *&#160;</td>
+          <td class="paramname"><em>renderer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TTF_Font *&#160;</td>
+          <td class="paramname"><em>font</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definíció a(z) <a class="el" href="players_8c_source.html">players.c</a> fájl <a class="el" href="players_8c_source.html#l00082">82</a>. sorában.</p>
+
+</div>
+</div>
+<a id="a38ade69739b5e67bdd691c905fc35a33" name="a38ade69739b5e67bdd691c905fc35a33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38ade69739b5e67bdd691c905fc35a33">&#9670;&nbsp;</a></span>Player__toggle_turn_active()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Player__toggle_turn_active </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structPlayer.html">Player</a> *&#160;</td>
+          <td class="paramname"><em>this</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definíció a(z) <a class="el" href="players_8c_source.html">players.c</a> fájl <a class="el" href="players_8c_source.html#l00156">156</a>. sorában.</p>
+
+</div>
+</div>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_f307a46daed1218fee22380d1eacedba.html">game</a></li><li class="navelem"><a class="el" href="player_8h.html">player.h</a></li>
+    <li class="footer">Készítette <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.4 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -17,6 +17,9 @@ TilesetWrapper TilesetWrapper__construct(SDL_Renderer* renderer)
         SDL_LogCritical(SDL_LOG_CATEGORY_ASSERT, "Nem sikerült a res/tileset.bmp beolvasása!\n%s", SDL_GetError());
         return new_tswrapper;
     }
+
+    if(renderer == NULL) return new_tswrapper;
+    
     new_tswrapper.tile_set = SDL_CreateTextureFromSurface(renderer, tileset_img);
     SDL_FreeSurface(tileset_img);
 
@@ -25,10 +28,10 @@ TilesetWrapper TilesetWrapper__construct(SDL_Renderer* renderer)
 
 void TilesetWrapper__destroy(TilesetWrapper* this)
 {
-    if(this->tile_set != NULL) SDL_DestroyTexture(this->tile_set);
+    if(this != NULL && this->tile_set != NULL) SDL_DestroyTexture(this->tile_set);
 }
 
-SDL_Rect TilesetWrapper__get_texture_rect_for(TilesetWrapper* this, TileType type)
+SDL_Rect get_texture_rect_for(TileType type)
 {
     TileType type_index = type;
 

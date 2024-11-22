@@ -15,11 +15,12 @@ project "CarcassoneClone"
     objdir "./bin-int"
 
     files {
-        "./src/**.c"
+        "./src/*.c",
+        "./src/ui/*.c",
+        "./src/player/*.c"
     }
     includedirs {
-        "./include",
-        "./src"
+        "./include"
     }
     externalincludedirs {
         "./include/debug"
