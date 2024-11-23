@@ -40,9 +40,55 @@ char* strcatdyn(char* original, char const* to_cat, bool is_utf8)
     return new_str;
 }
 
-void remove_last_utf8_char_dyn(char* str)
+char* remove_last_utf8_char_dyn(char* str)
 {
-    //
+    if(str == NULL) return NULL;
+    
+    size_t len = strlen(str);
+    if (len == 0) return NULL;
+
+    // UTF-8 enkódolási szabályok:
+    // - 1-byte karakter: 0xxxxxxx
+    // - 2-byte karakter: 110xxxxx 10xxxxxx
+    // - 3-byte karakter: 1110xxxx 10xxxxxx 10xxxxxx
+    // - 4-byte karakter: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+
+    size_t p = len - 1;
+    for(; p > 0; --p) {
+        // Megkeressük az első, nem "continuation" bitet; odatesszük a \0-t.
+        if ((str[p] & 0xC0) != 0x80) {
+            str[p] = '\0';
+            break;
+        }
+    }
+
+
+    char* edited_str = malloc(len);
+    for(size_t i = 0U; i < p; ++i) {
+        edited_str[i] = str[i];
+    }
+    edited_str[p] = '\0';
+
+    free(str);
+    str = NULL;
+
+    return edited_str;
+}
+
+size_t get_utf8_length(char const* str)
+{
+    if(str == NULL) return 0U;
+
+    char const* p = str;
+    size_t len = 0U;
+    while(*p != '\0') {
+        if ((*p & 0xC0) != 0x80) {
+            ++len;
+        }
+        ++p;
+    }
+
+    return len;
 }
 
 void destroy_SDL_Texture(SDL_Texture* texture)

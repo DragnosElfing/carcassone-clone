@@ -16,7 +16,6 @@
 Button Carcassone__Button__construct(Carcassone* this, TTF_Font* font, char* label, SDL_Rect global_rect, SDL_Color bg_color, SDL_Color text_color, bool center)
 {
     Button new_button = {.label = strdup_(label, true), .bg_color = bg_color, .global_rect = global_rect, .used_font = font};
-    DBG_LOG("LabeL: %s", new_button.label);
 
     int rect_width, rect_height;
     TTF_SizeUTF8(font, label, &rect_width, &rect_height);
@@ -43,7 +42,9 @@ void Carcassone__Button__render(Carcassone* this, Button* button)
     
     SDL_SetRenderDrawColor(this->renderer, button->bg_color.r, button->bg_color.g, button->bg_color.b, button->bg_color.a);
     SDL_RenderFillRect(this->renderer, NULL);
-    SDL_RenderCopy(this->renderer,button->label_texture, NULL, &button->label_rect);
+    if(button->label_texture != NULL) {
+        SDL_RenderCopy(this->renderer, button->label_texture, NULL, &button->label_rect);
+    }
 
     SDL_RenderSetViewport(this->renderer, NULL);
 }
@@ -51,7 +52,7 @@ void Carcassone__Button__render(Carcassone* this, Button* button)
 void Carcassone__Button__destroy(Carcassone* this, Button* button)
 {
     free(button->label);
-    if(button->label_texture != NULL) SDL_DestroyTexture(button->label_texture);
+    destroy_SDL_Texture(button->label_texture);
 }
 
 Prompt Carcassone__Prompt__construct(Carcassone* this, TTF_Font* font, char* default_label, SDL_Rect global_rect, SDL_Color bg_color, SDL_Color text_color)
@@ -68,10 +69,7 @@ void Carcassone__Prompt__edit(Carcassone* this, Prompt* prompt, char* new_label,
     if(concat) {
         prompt->prompt.label = strcatdyn(prompt->prompt.label, new_label, true);
     } else {
-        DBG_LOG("Before: %s", prompt->prompt.label);
-        free(prompt->prompt.label);
-        prompt->prompt.label = strdup_(new_label, true);
-        DBG_LOG("After: %s", prompt->prompt.label);
+        prompt->prompt.label = remove_last_utf8_char_dyn(this->game_screen->active_input->prompt.label);
     }
 
     destroy_SDL_Texture(prompt->prompt.label_texture);

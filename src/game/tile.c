@@ -80,8 +80,6 @@ void Tile__move_by(Tile* this, float mvx, float mvy)
     
     this->local_coords = (SDL_FPoint){this->local_coords.x + mvx * TILE_SIZE, this->local_coords.y + mvy * TILE_SIZE};
     this->global_coords = (SDL_FPoint){this->global_coords.x + mvx * TILE_SIZE, this->global_coords.y + mvy * TILE_SIZE};
-
-    //if(this->type == CASTLE_CAP_WALL_ROAD_BY) DBG_LOG("(%f, %d)", this->local_coords.x + mvy * TILE_SIZE, (int)(this->local_coords.x + mvy * TILE_SIZE));
 }
 
 void Tile__rotate(Tile* this)
@@ -97,7 +95,6 @@ void Tile__set_rotation(Tile* this, unsigned short new_rotation)
 
     ConnectionType prev_connections[4];
 
-    // TODO: no
     new_rotation %= 360;
     unsigned int r = this->rotation;
     while(r != new_rotation) {

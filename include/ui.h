@@ -73,8 +73,9 @@ typedef struct {
     CardPile* card_pile;
     size_t pile_index;
     
-    // Az első implementálásakor így lehetett normálisan megoldani (TEMP).
-    SDL_Texture* pile_counter[PILE_SIZE];
+    // TODO: Az első implementálásakor így lehetett normálisan megoldani (TEMP).
+    SDL_Texture* pile_counter;
+    bool update_counter;
     
     // Játékosok, referenciák
     Player players[2];

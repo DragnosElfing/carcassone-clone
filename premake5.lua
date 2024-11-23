@@ -17,7 +17,7 @@ project "CarcassoneClone"
     files {
         "./src/*.c",
         "./src/ui/*.c",
-        "./src/player/*.c"
+        "./src/game/*.c"
     }
     includedirs {
         "./include"

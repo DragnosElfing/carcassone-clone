@@ -32,16 +32,6 @@ Meeple Meeple__construct(SDL_Texture* texture)
     return new_meeple;
 }
 
-// /**
-//  * @brief Felszabadítja a megadott `Meeple` struktúra által lefoglalt memóriát.
-//  *
-//  * @param this A `Meeple` struktúra, aminek a lefoglalt memóriáját fel kell szabadítani.
-//  */
-// void Meeple__destroy(Meeple* this)
-// {
-//     destroy_SDL_Texture(this->texture);
-// }
-
 Player Player__construct(SDL_Renderer* renderer, TTF_Font* font, char* name, char const* meeple_outfit)
 {   
     Player new_player = {

@@ -6,7 +6,8 @@
 
 char* strdup_(char const*, bool);
 char* strcatdyn(char*, char const*, bool);
-void remove_last_utf8_char_dyn(char*);
+char* remove_last_utf8_char_dyn(char*);
+size_t get_utf8_length(char const*);
 void destroy_SDL_Texture(SDL_Texture*);
 SDL_Texture* create_SDL_texture_from_BMP(SDL_Renderer*, char const*);
 

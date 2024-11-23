@@ -1,7 +1,6 @@
 #include <SDL2/SDL.h>
 
 #include "game/tile.h"
-#include "app.h" // TODO: create a font manager
 #include "utils.h"
 
 #ifdef _CRCLONE_DEBUG
