@@ -1,6 +1,0 @@
-<map id="LeaderboardScreen" name="LeaderboardScreen">
-<area shape="rect" id="node1" title=" " alt="" coords="51,184,185,211"/>
-<area shape="rect" id="node2" href="$structLeaderboard.html" title=" " alt="" coords="21,95,114,121"/>
-<area shape="rect" id="node3" href="$structLeaderboardEntry.html" title=" " alt="" coords="5,5,129,32"/>
-<area shape="rect" id="node4" href="$structButton.html" title=" " alt="" coords="140,95,200,121"/>
-</map>

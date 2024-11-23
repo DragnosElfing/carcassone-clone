@@ -107,7 +107,7 @@ Carcassone* Carcassone__construct(int width, int height, char const* title)
  */
 void Carcassone__destroy(Carcassone* this)
 {
-    SDL_UnlockMutex(this->smutex);
+    if(SDL_LockMutex(this->smutex) == -1) SDL_UnlockMutex(this->smutex);
     SDL_DestroyMutex(this->smutex);
     this->is_running = false;
     if(SDL_IsTextInputActive()) SDL_StopTextInput();
@@ -144,7 +144,7 @@ void Carcassone__switch_state(Carcassone* this, AppState new_state)
             Carcassone__Game__init_pile(this);
             break;
         case LEADERBOARD:
-            Carcassone__Lboard__reconstruct(this);
+            Carcassone__Lboard__init_list_texture(this);
             break;
     }
 }
@@ -341,10 +341,10 @@ bool Carcassone__check_names_valid(Carcassone* this)
  */
 void Carcassone__Game__init_players(Carcassone* this) // TODO
 {
-    this->game_screen->players[0] = Player__construct(this->renderer, this->small_font,
-            this->game_screen->player_name_inputs[0].prompt.label); // TODO: NO
-    this->game_screen->players[1] = Player__construct(this->renderer, this->small_font,
-            this->game_screen->player_name_inputs[1].prompt.label); // TODO: NO
+    for(size_t p = 0U; p < 2; ++p) {
+        this->game_screen->players[p] = 
+            Player__construct(this->renderer, this->small_font, this->game_screen->player_name_inputs[p].prompt.label, "./res/meeple_base.bmp");
+    }
 
     this->game_screen->curr_player = &this->game_screen->players[0];
 }
@@ -798,7 +798,7 @@ void Carcassone__calculate_scores_for_cloister(Carcassone* this, Tile* cloister)
             if(!curr_m->is_placed) continue;
             if(curr_m->x != cloister->board_coords.x || curr_m->y != cloister->board_coords.y) continue;
 
-            Player__add_to_score(&this->game_screen->players[p], this->renderer, this->small_font, 3);
+            Player__add_to_score(&this->game_screen->players[p], 3);
             Player__reclaim_meeple(&this->game_screen->players[p], curr_m);
             cloister->is_scored = true;
             DBG_LOG("Added score (cloister) to: %s", this->game_screen->players[p].name);
@@ -816,7 +816,7 @@ void Carcassone__calculate_scores_for_road(Carcassone* this, Tile** roads, size_
                 if(!curr_m->is_placed) continue;
                 if(curr_m->x != roads[i]->board_coords.x || curr_m->y != roads[i]->board_coords.y) continue;
 
-                Player__add_to_score(&this->game_screen->players[p], this->renderer, this->small_font, point);
+                Player__add_to_score(&this->game_screen->players[p], point);
                 Player__reclaim_meeple(&this->game_screen->players[p], curr_m);
                 roads[i]->is_scored = true;
                 DBG_LOG("Added score (road) to: %s", this->game_screen->players[p].name);
@@ -835,7 +835,7 @@ void Carcassone__calculate_scores_for_castle(Carcassone* this, Tile** castles, s
                 if(!curr_m->is_placed) continue;
                 if(curr_m->x != castles[i]->board_coords.x || curr_m->y != castles[i]->board_coords.y) continue;
 
-                Player__add_to_score(&this->game_screen->players[p], this->renderer, this->small_font, point);
+                Player__add_to_score(&this->game_screen->players[p], point);
                 Player__reclaim_meeple(&this->game_screen->players[p], curr_m);
                 castles[i]->is_scored = true;
                 DBG_LOG("Added score (castle) to: %s", this->game_screen->players[p].name);
@@ -1014,7 +1014,7 @@ void Carcassone__Game__show_finish_screen(Carcassone* this) // TODO: rename to "
     }
     if(this->lboard_screen->leaderboard != NULL) {
         Leaderboard__insert_new(this->lboard_screen->leaderboard, this->game_screen->winner);
-        Leaderboard__load(this->lboard_screen->leaderboard, "res/data/records.dat");
+        Leaderboard__load(this->lboard_screen->leaderboard);
     }
 
     DBG_LOG("The winner is: %s", this->game_screen->winner == NULL ? "tie" : this->game_screen->winner->name);
@@ -1054,6 +1054,7 @@ void Carcassone__run(Carcassone* this)
             }
             SDL_UnlockMutex(this->smutex);
 
+            SDL_RenderPresent(this->renderer);
             Carcassone__handle_input(this);
         }
 

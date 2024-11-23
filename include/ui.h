@@ -8,6 +8,7 @@
 #include "game/tile.h"
 #include "game/player.h"
 
+// A játéktábla mérete (BOARD_SIZE * BOARD_SIZE)
 #define BOARD_SIZE 71
 
 // Gomb
@@ -19,7 +20,7 @@ typedef struct {
     TTF_Font* used_font;
 } Button;
 
-// Szöveginput (régi verzió miatt van külön a gombtól, amúgy azzal is lehet implementálni, csak talán így szebb)
+// Szöveginput (régi verzió miatt van külön a gombtól, s azzal is lehet implementálni, csak talán így szebb)
 typedef struct {
     Button prompt;
 } Prompt;
@@ -38,6 +39,7 @@ typedef struct {
 // Dicsőséglista állapot
 typedef struct {
     Leaderboard* leaderboard;
+    char syntax_error_msg[128+1];
 
     // A rekordok egy textúrán
     SDL_Texture* list_texture;
@@ -78,10 +80,9 @@ typedef struct {
     Player players[2];
     Player* curr_player;
     Player* winner;
-    SDL_Texture* meeple_texture;
     SDL_Texture* crown_texture;
 
-    // Játékos neveknek a szöveginputjai
+    // Játékosneveknek a szöveginputjai
     SDL_Texture* player_input_labels[2];
     Prompt player_name_inputs[2];
     Prompt* active_input;

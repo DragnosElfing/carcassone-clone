@@ -1,4 +1,3 @@
-#include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +6,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
+#include "utils.h"
 #include "game/player.h"
 #include "game/tile.h"
 #include "ui.h"
@@ -16,23 +16,24 @@
     #include "debug/debugmalloc.h"
 #endif
 
+/**
+ * @brief Létrehozza a menünézetet.
+ *
+ * Megjegyzés: A lefoglalt memória megfelelő felszabadításához meg kell hívni a `Carcassone__Menu__destroy` függvényt.
+ *
+ * @param this A `Carcassone` struktúra, amelynek létrehozza a menünézetét.
+ */
 void Carcassone__Menu__construct(Carcassone* this)
 {
     this->menu_screen = malloc(sizeof(MenuScreen));
-    SDL_Surface* menu_background_image = SDL_LoadBMP("./res/menu_bg.bmp");
-    if(menu_background_image != NULL) {
-        this->menu_screen->background = SDL_CreateTextureFromSurface(this->renderer, menu_background_image);
-        if(this->menu_screen->background == NULL) {
-            SDL_LogError(SDL_LOG_CATEGORY_RENDER, "Nem lehetett betölteni az háttérképet!");
-            SDL_LogError(SDL_LOG_CATEGORY_RENDER, "%s", SDL_GetError());
-        }
-        SDL_FreeSurface(menu_background_image);
-    }
+    this->menu_screen->background = create_SDL_texture_from_BMP(this->renderer, "./res/menu_bg.bmp");
+
+    // A háttérkép transzparenciája miatt.
     SDL_SetRenderDrawBlendMode(this->renderer, SDL_BLENDMODE_BLEND);
 
     this->menu_screen->button_container = (SDL_Rect){this->width/2 - 400, 250, 800, 600};
 
-    // Create buttons
+    // Gombok létrehozása
     SDL_Rect start_button_rect = {
         this->menu_screen->button_container.x + this->menu_screen->button_container.w / 2 - 100,
         this->menu_screen->button_container.y + 100,
@@ -49,127 +50,148 @@ void Carcassone__Menu__construct(Carcassone* this)
     this->menu_screen->lboard_button = 
         Carcassone__Button__construct(this, this->default_font, "DICSŐSÉGLISTA", lboard_button_rect, (SDL_Color){COLOR_BLUE}, (SDL_Color){COLOR_WHITE}, true);
 }
+
+/**
+ * @brief Felszabadítja a megadott `Carcassone` struktúrához tartozó `MenuScreen` által lefoglalt memóriát.
+ *
+ * @param this A `Carcassone` struktúra, aminek a lefoglalt memóriáját fel kell szabadítani.
+ */
 void Carcassone__Menu__destroy(Carcassone* this)
 {
-    if(this->menu_screen->background != NULL) SDL_DestroyTexture(this->menu_screen->background);
+    destroy_SDL_Texture(this->menu_screen->background);
     Carcassone__Button__destroy(this, &this->menu_screen->start_button);
     Carcassone__Button__destroy(this, &this->menu_screen->lboard_button);
     free(this->menu_screen);
 }
+
+/**
+ * @brief Menünézet megjelenítése.
+ *
+ * @param this A `Carcassone` struktúra, amihez a menü tartozik.
+ */
 void Carcassone__Menu__render(Carcassone* this)
 {
     SDL_RenderClear(this->renderer);
-    SDL_RenderCopy(this->renderer, this->menu_screen->background, NULL, NULL);
 
+    // Háttér.
+    SDL_RenderCopy(this->renderer, this->menu_screen->background, NULL, NULL);
     SDL_SetRenderDrawColor(this->renderer, 235, 235, 225, 100);
-    SDL_RenderFillRectF(this->renderer, NULL);
+    SDL_RenderFillRect(this->renderer, NULL);
 
     Carcassone__Button__render(this, &this->menu_screen->start_button);
     Carcassone__Button__render(this, &this->menu_screen->lboard_button);
 
+    // TODO: a splash_title minden nézetben ugyanott van
     SDL_RenderCopy(this->renderer, this->splash_title, NULL,
         &(SDL_Rect){this->width/2 - 400, 0, 800, 240});
-
-    SDL_RenderPresent(this->renderer);
 }
 
+/**
+ * @brief Létrehozza a dicsőséglistanézetet.
+ *
+ * Megjegyzés: A lefoglalt memória megfelelő felszabadításához meg kell hívni a `Carcassone__Lboard__destroy` függvényt.
+ *
+ * @param this A `Carcassone` struktúra, amelynek létrehozza a dicsőséglistanézetét.
+ */
 void Carcassone__Lboard__construct(Carcassone* this)
 {
     this->lboard_screen = malloc(sizeof(LeaderboardScreen));
-    // Load and sort leaderboard data
     this->lboard_screen->leaderboard = Leaderboard__construct("res/data/records.dat");
+    this->lboard_screen->list_texture = NULL;
+    strcpy(this->lboard_screen->syntax_error_msg, "Hibás fájlformátum!");
 
+    // "Vissza" gomb.
     this->lboard_screen->back_button = 
         Carcassone__Button__construct(this, this->small_font, "VISSZA", (SDL_Rect){this->width - 150, 10, 140, 50}, 
         (SDL_Color){COLOR_WHITE}, (SDL_Color){0, 0, 0, 255}, true);
 
-    // Texture for the leaderboard entries
-    this->lboard_screen->list_texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-        1000, this->height - 200);
-    SDL_SetRenderTarget(this->renderer, this->lboard_screen->list_texture);
-
-    if(this->lboard_screen->leaderboard != NULL) {
-        Leaderboard__sort(this->lboard_screen->leaderboard);
-        char score_string[10+1];
-        int w, h;
-        for(size_t place = 0U; place < MIN(5, this->lboard_screen->leaderboard->entries_size); ++place) {
-            char* curr_name = this->lboard_screen->leaderboard->entries[place].name;
-            TTF_SizeUTF8(this->small_font, curr_name, &w, &h);
-            SDL_RenderCopy(this->renderer, SDL_CreateTextureFromSurface(
-                this->renderer, TTF_RenderUTF8_Blended(this->small_font, this->lboard_screen->leaderboard->entries[place].name,
-                (SDL_Color){COLOR_WHITE})), 
-                NULL, &(SDL_Rect){0, 160 * place, w, h});
-
-            sprintf(score_string, "%u", this->lboard_screen->leaderboard->entries[place].highscore);
-            TTF_SizeUTF8(this->small_font, score_string, &w, &h);
-            SDL_RenderCopy(this->renderer, SDL_CreateTextureFromSurface(
-                this->renderer, TTF_RenderUTF8_Blended(this->default_font, score_string,
-                (SDL_Color){COLOR_WHITE})), NULL, &(SDL_Rect){0, 160 * place + h, 
-                    w, h});
-        }
-    } else {
-        int w, h;
-        TTF_SizeUTF8(this->default_font, "Hibás fájlformátum!", &w, &h);
-        SDL_RenderCopy(this->renderer, SDL_CreateTextureFromSurface(
-            this->renderer, TTF_RenderUTF8_Blended(this->default_font, 
-            "Hibás fájlformátum!", (SDL_Color){COLOR_WHITE})), NULL, 
-            &(SDL_Rect){100, 100, w, h});
-    }
-
-    SDL_SetRenderTarget(this->renderer, NULL);
-    SDL_SetTextureBlendMode(this->lboard_screen->list_texture, SDL_BLENDMODE_BLEND);
+    Carcassone__Lboard__init_list_texture(this);
 }
+
+/**
+ * @brief Felszabadítja a megadott `Carcassone` struktúrához tartozó `LeaderboardScreen` által lefoglalt memóriát.
+ *
+ * @param this A `Carcassone` struktúra, aminek a lefoglalt memóriáját fel kell szabadítani.
+ */
 void Carcassone__Lboard__destroy(Carcassone* this)
 {
     Leaderboard__destroy(this->lboard_screen->leaderboard);
-    if(this->lboard_screen->list_texture != NULL) SDL_DestroyTexture(this->lboard_screen->list_texture);
+    destroy_SDL_Texture(this->lboard_screen->list_texture);
     Carcassone__Button__destroy(this, &this->lboard_screen->back_button);
     free(this->lboard_screen);
 }
 
-void Carcassone__Lboard__reconstruct(Carcassone* this)
+/**
+ * @brief Létrehozza a dicsőséglistanézethez a rekordokat.
+ *
+ * Akkor kell meghívni, ha frissül a rekordfájl.
+ *
+ * @param this A `Carcassone` struktúra, amelynek létrehozza a dicsőséglistanézetét.
+ */
+void Carcassone__Lboard__init_list_texture(Carcassone* this)
 {
-    this->lboard_screen->back_button = 
-        Carcassone__Button__construct(this, this->small_font, "VISSZA", (SDL_Rect){this->width - 150, 10, 140, 50}, 
-        (SDL_Color){COLOR_WHITE}, (SDL_Color){0, 0, 0, 255}, true);
-
-    // Texture for the leaderboard entries
+    // A rekordok.
+    destroy_SDL_Texture(this->lboard_screen->list_texture);
     this->lboard_screen->list_texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
         1000, this->height - 200);
     SDL_SetRenderTarget(this->renderer, this->lboard_screen->list_texture);
 
     if(this->lboard_screen->leaderboard != NULL) {
         Leaderboard__sort(this->lboard_screen->leaderboard);
-        char score_string[10+1];
+        
+        char score_string[10+1]; // safe bet
         int w, h;
+        // A top 5 rekord megjelenítése.
         for(size_t place = 0U; place < MIN(5, this->lboard_screen->leaderboard->entries_size); ++place) {
+            // A rekordhoz tartozó játékos neve.
             char* curr_name = this->lboard_screen->leaderboard->entries[place].name;
             TTF_SizeUTF8(this->small_font, curr_name, &w, &h);
-            SDL_RenderCopy(this->renderer, SDL_CreateTextureFromSurface(
-                this->renderer, TTF_RenderUTF8_Blended(this->small_font, this->lboard_screen->leaderboard->entries[place].name,
-                (SDL_Color){COLOR_WHITE})), 
-                NULL, &(SDL_Rect){0, 160 * place, w, h});
-
+            SDL_Surface* name_surface = TTF_RenderUTF8_Blended(this->small_font, this->lboard_screen->leaderboard->entries[place].name,
+                (SDL_Color){COLOR_WHITE});
+            if(name_surface != NULL) {
+                SDL_Texture* name = SDL_CreateTextureFromSurface(this->renderer, name_surface);
+                SDL_RenderCopy(this->renderer, name, 
+                    NULL, &(SDL_Rect){0, 160 * place, w, h});
+                SDL_FreeSurface(name_surface);
+                destroy_SDL_Texture(name);
+            }
+            
+            // A rekord.
             sprintf(score_string, "%u", this->lboard_screen->leaderboard->entries[place].highscore);
             TTF_SizeUTF8(this->small_font, score_string, &w, &h);
-            SDL_RenderCopy(this->renderer, SDL_CreateTextureFromSurface(
-                this->renderer, TTF_RenderUTF8_Blended(this->default_font, score_string,
-                (SDL_Color){COLOR_WHITE})), NULL, &(SDL_Rect){0, 160 * place + h, 
-                    w, h});
+            SDL_Surface* score_surface = TTF_RenderUTF8_Blended(this->default_font, score_string,
+                (SDL_Color){COLOR_WHITE});
+            if(score_surface != NULL) {
+                SDL_Texture* score = SDL_CreateTextureFromSurface(this->renderer, score_surface);
+                SDL_RenderCopy(this->renderer, score, 
+                    NULL, &(SDL_Rect){0, 160 * place + h, w, h});
+                SDL_FreeSurface(score_surface);
+                destroy_SDL_Texture(score);
+            }
         }
     } else {
+        // Hibás formátum esetén.
         int w, h;
-        TTF_SizeUTF8(this->default_font, "Hibás fájlformátum!", &w, &h);
-        SDL_RenderCopy(this->renderer, SDL_CreateTextureFromSurface(
-            this->renderer, TTF_RenderUTF8_Blended(this->default_font, 
-            "Hibás fájlformátum!", (SDL_Color){COLOR_WHITE})), NULL, 
-            &(SDL_Rect){100, 100, w, h});
+        TTF_SizeUTF8(this->small_font, this->lboard_screen->syntax_error_msg, &w, &h);
+        SDL_Surface* msg_surface = TTF_RenderUTF8_Blended(this->default_font, this->lboard_screen->syntax_error_msg,
+            (SDL_Color){COLOR_WHITE});
+        if(msg_surface != NULL) {
+            SDL_Texture* error_msg = SDL_CreateTextureFromSurface(this->renderer, msg_surface);
+            SDL_RenderCopy(this->renderer, error_msg, NULL, &(SDL_Rect){100, 100, w, h});
+            SDL_FreeSurface(msg_surface);
+            destroy_SDL_Texture(error_msg);
+        }
     }
 
     SDL_SetRenderTarget(this->renderer, NULL);
     SDL_SetTextureBlendMode(this->lboard_screen->list_texture, SDL_BLENDMODE_BLEND);
 }
 
+/**
+ * @brief Dicsőséglistanézet megjelenítése.
+ *
+ * @param this A `Carcassone` struktúra, amihez a dicsőséglista tartozik.
+ */
 void Carcassone__Lboard__render(Carcassone* this)
 {
     SDL_SetRenderDrawColor(this->renderer, COLOR_BG);
@@ -182,10 +204,15 @@ void Carcassone__Lboard__render(Carcassone* this)
 
     SDL_RenderCopy(this->renderer, this->lboard_screen->list_texture, NULL,
         &(SDL_Rect){this->width/2 - 500, 250, 1000, 700});
-
-    SDL_RenderPresent(this->renderer);
 }
 
+/**
+ * @brief Létrehozza a játéknézetet.
+ *
+ * Megjegyzés: A lefoglalt memória megfelelő felszabadításához meg kell hívni a `Carcassone__Game__destroy` függvényt.
+ *
+ * @param this A `Carcassone` struktúra, amelynek létrehozza a játéknézetét.
+ */
 void Carcassone__Game__construct(Carcassone* this)
 {
     this->game_screen = malloc(sizeof(GameScreen));
@@ -203,6 +230,7 @@ void Carcassone__Game__construct(Carcassone* this)
         this->game_screen->held_arrow_keys[k] = 0;
     }
 
+    // TODO: ezt ne így
     char counter_string[2] = "0";
     SDL_Surface* curr_index_surface = TTF_RenderText_Blended(this->default_font, counter_string, (SDL_Color){COLOR_WHITE});
     for(size_t ti = 0U; ti < PILE_SIZE; ++ti) {
@@ -210,12 +238,12 @@ void Carcassone__Game__construct(Carcassone* this)
         curr_index_surface = TTF_RenderText_Blended(this->default_font, counter_string, (SDL_Color){COLOR_WHITE});
         if(curr_index_surface != NULL) {
             this->game_screen->pile_counter[ti] = SDL_CreateTextureFromSurface(this->renderer, curr_index_surface);
+            SDL_FreeSurface(curr_index_surface);
         }
 
         if(this->game_screen->pile_counter[ti] == NULL)
             break;
     }
-    SDL_FreeSurface(curr_index_surface);
 
     this->game_screen->board_texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888,
         SDL_TEXTUREACCESS_TARGET, 600, this->height - this->game_screen->board_offset.y - 10);
@@ -267,31 +295,29 @@ void Carcassone__Game__construct(Carcassone* this)
 
     this->game_screen->active_input = &this->game_screen->player_name_inputs[0];
 
-    SDL_Surface* meeple_img = SDL_LoadBMP("./res/meeple_base.bmp");
-    if(meeple_img != NULL) {
-        this->game_screen->meeple_texture = SDL_CreateTextureFromSurface(this->renderer, meeple_img);
-        SDL_FreeSurface(meeple_img);
-    }
-    SDL_Surface* crown_img = SDL_LoadBMP("./res/winners_crown.bmp");
-    if(crown_img != NULL) {
-        this->game_screen->crown_texture = SDL_CreateTextureFromSurface(this->renderer, crown_img);
-        SDL_FreeSurface(crown_img);
-    }
+    this->game_screen->crown_texture = create_SDL_texture_from_BMP(this->renderer, "./res/winners_crown.bmp");
 }
 
+/**
+ * @brief Felszabadítja a megadott `Carcassone` struktúrához tartozó `GameScreen` által lefoglalt memóriát.
+ *
+ * @param this A `Carcassone` struktúra, aminek a lefoglalt memóriáját fel kell szabadítani.
+ */
 void Carcassone__Game__destroy(Carcassone* this)
 {
-    if(this->game_screen->board_texture != NULL) SDL_DestroyTexture(this->game_screen->board_texture);
+    destroy_SDL_Texture(this->game_screen->board_texture);
     for(size_t n = 0U; n < PILE_SIZE; ++n) {
-        if(this->game_screen->pile_counter[n] != NULL) SDL_DestroyTexture(this->game_screen->pile_counter[n]);
+        destroy_SDL_Texture(this->game_screen->pile_counter[n]);
     }
 
     for(size_t p = 0U; p < 2; ++p) {
         Player__destroy(&this->game_screen->players[p]);
     }
 
-    for(size_t n = 0U; n < BOARD_SIZE; ++n) {
-        free(this->game_screen->board[n]);
+    if(this->game_screen->board != NULL) {
+        for(size_t n = 0U; n < BOARD_SIZE; ++n) {
+            free(this->game_screen->board[n]);
+        }
     }
     free(this->game_screen->board);
     CardPile__destroy(this->game_screen->card_pile);
@@ -303,16 +329,20 @@ void Carcassone__Game__destroy(Carcassone* this)
     Carcassone__Prompt__destroy(this, &this->game_screen->player_name_inputs[0]);
     Carcassone__Prompt__destroy(this, &this->game_screen->player_name_inputs[1]);
     for(size_t i = 0U; i < 2; ++i) {
-        if(this->game_screen->player_input_labels[i] != NULL) SDL_DestroyTexture(this->game_screen->player_input_labels[i]);
+        destroy_SDL_Texture(this->game_screen->player_input_labels[i]);
     }
 
-    if(this->game_screen->meeple_texture != NULL) SDL_DestroyTexture(this->game_screen->meeple_texture);
-    if(this->game_screen->crown_texture != NULL) SDL_DestroyTexture(this->game_screen->crown_texture);
+    destroy_SDL_Texture(this->game_screen->crown_texture);
 
     TilesetWrapper__destroy(&this->game_screen->tileset_wrapper);
     free(this->game_screen);
 }
 
+/**
+ * @brief Játéknézet megjelenítése.
+ *
+ * @param this A `Carcassone` struktúra, amihez a nézet tartozik.
+ */
 void Carcassone__Game__render(Carcassone* this)
 {
     SDL_SetRenderDrawColor(this->renderer, COLOR_BG);
@@ -337,18 +367,16 @@ void Carcassone__Game__render(Carcassone* this)
     } else {
         Carcassone__Game__render_board(this);
         Carcassone__Game__render_meeples(this);
+        if(!this->game_screen->is_game_over) {
+            Carcassone__indicate_possible_placements(this);
+            Carcassone__Game__render_drawn_tile(this);
+        }
         Carcassone__render_splash_title(this);
         Carcassone__Game__render_player_stats(this);
-        if(!this->game_screen->is_game_over) {
-            Carcassone__Game__render_drawn_tile(this);
-            Carcassone__indicate_possible_placements(this);
-        }
         Carcassone__Button__render(this, &this->game_screen->concede_button);
         Carcassone__Button__render(this, &this->game_screen->end_turn_button);
         if(this->game_screen->is_game_over) {
             Carcassone__Game__render_game_over(this);
         }
     }
-
-    SDL_RenderPresent(this->renderer);
 }

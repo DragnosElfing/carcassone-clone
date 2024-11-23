@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <wchar.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
@@ -30,32 +31,39 @@ typedef struct {
     SDL_Texture* score_counter;
     SDL_Texture* handle_texture;
     SDL_Texture* stat_panel;
+    SDL_Texture* own_meeple_texture;
+
+    // Kell e frissíteni a pontot
     bool update_score;
 } Player;
-Player Player__construct(SDL_Renderer*, TTF_Font*, char*);
+Player Player__construct(SDL_Renderer*, TTF_Font*, char*, char const*);
 void Player__place_meeple(Player*, SDL_Point);
 void Player__reclaim_meeple(Player*, Meeple*);
 void Player__render(Player*, SDL_Renderer*, TTF_Font*);
-void Player__toggle_turn_active(Player*);
-void Player__add_to_score(Player*, SDL_Renderer*, TTF_Font*, unsigned int);
+void Player__add_to_score(Player*, unsigned int);
 void Player__destroy(Player*);
 
 // Dicsőséglista rekord
 typedef struct {
-    char name[MAX_PLAYER_NAME_LEN + 1];
+    // Játékos neve
+    char name[(MAX_PLAYER_NAME_LEN + 1) * sizeof(wchar_t)];
+
+    // Játékos rekordja
     unsigned int highscore;
 } LeaderboardEntry;
 
 typedef struct {
-    // TODO: save file name dyn
+    // A rekordfájl elérési útvonala
+    char const* records_file_path;
+
+    // A rekordok
     LeaderboardEntry* entries;
     size_t entries_size;
 } Leaderboard;
 Leaderboard* Leaderboard__construct(char const*);
 void Leaderboard__destroy(Leaderboard*);
 void Leaderboard__sort(Leaderboard*);
-bool Leaderboard__load(Leaderboard*, char const*);
-unsigned int Leaderboard__get_highscore_for(Leaderboard*, char const*);
+bool Leaderboard__load(Leaderboard*);
 bool Leaderboard__insert_new(Leaderboard*, Player*);
 
 #endif

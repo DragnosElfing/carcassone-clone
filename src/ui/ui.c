@@ -7,6 +7,7 @@
 
 #include "ui.h"
 #include "app.h"
+#include "utils.h"
 
 #ifdef _CRCLONE_DEBUG
     #include "debug/debugmalloc.h"
@@ -14,7 +15,8 @@
 
 Button Carcassone__Button__construct(Carcassone* this, TTF_Font* font, char* label, SDL_Rect global_rect, SDL_Color bg_color, SDL_Color text_color, bool center)
 {
-    Button new_button = {.label = label, .bg_color = bg_color, .global_rect = global_rect, .used_font = font};
+    Button new_button = {.label = strdup_(label, true), .bg_color = bg_color, .global_rect = global_rect, .used_font = font};
+    DBG_LOG("LabeL: %s", new_button.label);
 
     int rect_width, rect_height;
     TTF_SizeUTF8(font, label, &rect_width, &rect_height);
@@ -48,17 +50,14 @@ void Carcassone__Button__render(Carcassone* this, Button* button)
 
 void Carcassone__Button__destroy(Carcassone* this, Button* button)
 {
+    free(button->label);
     if(button->label_texture != NULL) SDL_DestroyTexture(button->label_texture);
 }
 
 Prompt Carcassone__Prompt__construct(Carcassone* this, TTF_Font* font, char* default_label, SDL_Rect global_rect, SDL_Color bg_color, SDL_Color text_color)
 {
-    char* label = malloc((24+1) * sizeof(wchar_t));
-    for(size_t i = 0U; i <= strlen(default_label); ++i) {
-        label[i] = default_label[i];
-    }
     Prompt new_prompt = {
-        .prompt = Carcassone__Button__construct(this, font, label, global_rect, bg_color, text_color, false),
+        .prompt = Carcassone__Button__construct(this, font, default_label, global_rect, bg_color, text_color, false),
     };
 
     return new_prompt;
@@ -67,12 +66,15 @@ Prompt Carcassone__Prompt__construct(Carcassone* this, TTF_Font* font, char* def
 void Carcassone__Prompt__edit(Carcassone* this, Prompt* prompt, char* new_label, bool concat)
 {   
     if(concat) {
-        strcat(prompt->prompt.label, new_label);
+        prompt->prompt.label = strcatdyn(prompt->prompt.label, new_label, true);
     } else {
-        strcpy(prompt->prompt.label, new_label);
+        DBG_LOG("Before: %s", prompt->prompt.label);
+        free(prompt->prompt.label);
+        prompt->prompt.label = strdup_(new_label, true);
+        DBG_LOG("After: %s", prompt->prompt.label);
     }
 
-    if(prompt->prompt.label_texture != NULL) SDL_DestroyTexture(prompt->prompt.label_texture);
+    destroy_SDL_Texture(prompt->prompt.label_texture);
 
     SDL_Surface* updated_surface = TTF_RenderUTF8_Blended(prompt->prompt.used_font, prompt->prompt.label, (SDL_Color){0, 0, 0, 255});
     if(updated_surface != NULL) {
@@ -93,6 +95,5 @@ void Carcassone__Prompt__render(Carcassone* this, Prompt* prompt)
 
 void Carcassone__Prompt__destroy(Carcassone* this, Prompt* prompt)
 {
-    free(prompt->prompt.label);
     Carcassone__Button__destroy(this, &prompt->prompt);
 }

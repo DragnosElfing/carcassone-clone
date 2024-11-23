@@ -1,6 +1,8 @@
 #include <SDL2/SDL.h>
 
 #include "game/tile.h"
+#include "app.h" // TODO: create a font manager
+#include "utils.h"
 
 #ifdef _CRCLONE_DEBUG
     #include "debug/debugmalloc.h"
@@ -28,7 +30,9 @@ TilesetWrapper TilesetWrapper__construct(SDL_Renderer* renderer)
 
 void TilesetWrapper__destroy(TilesetWrapper* this)
 {
-    if(this != NULL && this->tile_set != NULL) SDL_DestroyTexture(this->tile_set);
+    if(this != NULL) {
+        destroy_SDL_Texture(this->tile_set);
+    }
 }
 
 SDL_Rect get_texture_rect_for(TileType type)

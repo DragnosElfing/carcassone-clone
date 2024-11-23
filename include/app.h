@@ -72,7 +72,7 @@ void Carcassone__Menu__handle_input(SDL_Event);
 void Carcassone__Lboard__construct(Carcassone*);
 void Carcassone__Lboard__destroy(Carcassone*);
 void Carcassone__Lboard__render(Carcassone*);
-void Carcassone__Lboard__reconstruct(Carcassone*);
+void Carcassone__Lboard__init_list_texture(Carcassone*);
 void Carcassone__Lboard__handle_input(SDL_Event);
 
 void Carcassone__Game__construct(Carcassone*);

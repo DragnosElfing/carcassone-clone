@@ -57,7 +57,10 @@ project "CarcassoneClone"
         optimize "On"
 
         postbuildcommands {
-            "doxygen dconfig"
+            "doxygen dconfig",
+            "cd ./docs/latex && pdflatex -interaction=batchmode refman.tex ; cd ../../",
+            "mv ./docs/latex/refman.pdf programozoi_dokumentacio.pdf",
+            "rm -r ./docs"
         }
 
         warnings "Off"

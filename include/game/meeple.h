@@ -11,10 +11,10 @@ typedef struct {
     // Ha !is_placed, akkor akár invalid, "szemét" értéket is tárolhat.
     int x, y;
 
-    // Mindegyik alattvalónak ugyanaz a textúrája valójában.
+    // Játékosoként változtatható kinézet
     SDL_Texture* texture;
 } Meeple;
-Meeple Meeple__construct(SDL_Renderer*);
+Meeple Meeple__construct(SDL_Texture*);
 void Meeple__render(SDL_Renderer*, unsigned int, SDL_Color);
 void Meeple__destroy(Meeple*);
 
