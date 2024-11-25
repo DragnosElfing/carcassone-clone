@@ -4,14 +4,16 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 
+/*! Alattvaló. */
 typedef struct {
-    // Le van e helyezve
+    // Le van e helyezve.
     bool is_placed;
 
+    // Táblakoordináták.
     // Ha !is_placed, akkor akár invalid, "szemét" értéket is tárolhat.
     int x, y;
 
-    // Játékosoként változtatható kinézet
+    // Kinézete. (játékosoként változtatható).
     SDL_Texture* texture;
 } Meeple;
 Meeple Meeple__construct(SDL_Texture*);

@@ -8,89 +8,105 @@
 #include "game/tile.h"
 #include "game/player.h"
 
-// A játéktábla mérete (BOARD_SIZE * BOARD_SIZE)
+/*! A játéktábla mérete (BOARD_SIZE * BOARD_SIZE) */
 #define BOARD_SIZE 71
 
-// Gomb
+/*! Gomb */
 typedef struct {
-    SDL_Rect label_rect, local_rect, global_rect;
-    SDL_Color bg_color;
+    // Címke.
     char* label;
     SDL_Texture* label_texture;
+    SDL_Rect label_rect;
+
+    // Címke betűtípusa.
     TTF_Font* used_font;
+
+    // A gomb pozíciója (lokálisan és globálisan).
+    SDL_Rect local_rect, global_rect;
+
+    // Háttérszín.
+    SDL_Color bg_color;
 } Button;
 
-// Szöveginput (régi verzió miatt van külön a gombtól, s azzal is lehet implementálni, csak talán így szebb)
+/*! Szöveginput. (egy régi verzió miatt van külön a gombtól) */
 typedef struct {
     Button prompt;
 } Prompt;
 
-// Menü állapot
+/*! Menünézet. */
 typedef struct {
-    // Háttérkép
+    // Háttérkép.
     SDL_Texture* background;
 
-    // A "menü menü"
+    // A "menü menü."
     SDL_Rect button_container;
     Button start_button;
     Button lboard_button;
 } MenuScreen;
 
-// Dicsőséglista állapot
+/*! Dicsőséglistanézet. */
 typedef struct {
+    // Maga a dicsésglista (és adatai).
     Leaderboard* leaderboard;
+
+    // Hibaüzenet hibás formátum esetén.
     char syntax_error_msg[128+1];
 
-    // A rekordok egy textúrán
+    // A rekordok egy textúrán.
     SDL_Texture* list_texture;
     
-    // "Vissza" gomb
+    // "Vissza" gomb.
     Button back_button;
 } LeaderboardScreen;
 
-// Játék állapot
+/*! Játéknézet. */
 typedef struct {
-    // A ready_button meg lett e nyomva
+    // A ready_button meg lett e nyomva.
     bool is_ready;
 
-    // Vége van e játéknak
+    // Vége van e játéknak.
     bool is_game_over;
 
-    // A tábla smooth mozgatása miatt van egy "global state" a lenyomott nyilakhoz.
+    // "Global state" a lenyomott nyílgombokhoz. (a tábla smooth mozgatása miatt)
     int held_arrow_keys[4];
 
-    // A tábla felsősarkának koordinátái
+    // A tábla felsősarkának koordinátái.
     SDL_FPoint board_offset;
     
-    // Tábla
+    // Tábla.
     Tile** board;
     SDL_Texture* board_texture;
 
-    // Húzott kártya
+    // Húzott kártya.
     Tile* drawn_tile;
 
-    // Pakli
+    // Pakli.
     CardPile* card_pile;
     size_t pile_index;
     
-    // TODO: Az első implementálásakor így lehetett normálisan megoldani (TEMP).
+    // Pakliszámláló.
     SDL_Texture* pile_counter;
+
+    // Kell e frissíteni a pakliszámlálót.
     bool update_counter;
     
-    // Játékosok, referenciák
+    // Játékosok, referenciák.
     Player players[2];
     Player* curr_player;
     Player* winner;
+
+    // A korona textúra.
     SDL_Texture* crown_texture;
 
-    // Játékosneveknek a szöveginputjai
+    // Játékosneveknek a szöveginputjai.
     SDL_Texture* player_input_labels[2];
     Prompt player_name_inputs[2];
     Prompt* active_input;
     
-    // Startgomb, "Kör vége" gomb, "Felad" gomb
+    // "Ok" gomb, "Kör vége" gomb, "Felad" gomb.
     Button ready_button, end_turn_button, concede_button;
     
+    // Az táblaatlasz.
     TilesetWrapper tileset_wrapper;
 } GameScreen;
 

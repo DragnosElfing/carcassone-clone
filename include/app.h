@@ -14,7 +14,7 @@
 #define FPS 60
 /*! Egyszerű minimum meghatározó. */
 #define MIN(x, y) ((x < y) ? x : y)
-// Színek.
+/*! Színek. */
 #define COLOR_BLUE 25, 30, 91, 255
 #define COLOR_LIGHTBLUE 153, 204, 255, 255
 #define COLOR_WHITE 255, 255, 255, 255
@@ -31,22 +31,37 @@ typedef enum {
     LEADERBOARD
 } AppState;
 
+/*! Magát a programot reprezentáló struktúra. */
 typedef struct {
-    // Általános adatok
+    // Ablak dimenziói.
     int width, height;
+
+    // Fut e.
     bool is_running;
+
+    // Az ablak.
     SDL_Window* window;
+
+    // Ablakikon.
     SDL_Surface* window_icon;
+
+    // Splash cím.
     SDL_Texture* splash_title;
+
+    // A renderer.
     SDL_Renderer* renderer;
+
+    // A használt betűtípusok.
     TTF_Font* default_font, * small_font;
 
-    // Állapotok
-    SDL_mutex* smutex;
+    // Állapotok.
     AppState state;
     MenuScreen* menu_screen;
     LeaderboardScreen* lboard_screen;
     GameScreen* game_screen;
+
+    // Mutex arra az esetre, mikor visszamegyünk a menübe game over-t követve.
+    SDL_mutex* smutex;
 } Carcassone;
 Carcassone* Carcassone__construct(int, int, char const*);
 void Carcassone__destroy(Carcassone*);
@@ -78,7 +93,7 @@ void Carcassone__Game__render_drawn_tile(Carcassone*);
 void Carcassone__Game__render_player_stats(Carcassone*);
 void Carcassone__Game__render_meeples(Carcassone*);
 void Carcassone__Game__render_game_over(Carcassone*);
-void Carcassone__Game__wrapup(Carcassone*);
+void Carcassone__Game__wrapup(Carcassone*, bool);
 void Carcassone__Game__move_board(Carcassone*, float);
 bool Carcassone__Game__draw_new(Carcassone*);
 bool Carcassone__Game__check_names_valid(Carcassone*);

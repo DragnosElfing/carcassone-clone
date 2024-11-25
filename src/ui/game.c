@@ -1,4 +1,3 @@
-#include <SDL2/SDL_events.h>
 #include <stdlib.h>
 
 #include "game/tile.h"
@@ -51,6 +50,7 @@ void Carcassone__Game__construct(Carcassone* this)
     Carcassone__Game__draw_new(this);
 
     // nagyszerűen néz ki
+    // abban az esetben a legszélesebb a prompt mikor mindegyik karakter "W"
     int max_width, height;
     TTF_SizeUTF8(this->small_font, "WWWWWWWWWWWWWWWWWWWWWWWW", &max_width, &height);
 
@@ -135,6 +135,12 @@ void Carcassone__Game__destroy(Carcassone* this)
     free(this->game_screen);
 }
 
+/**
+ * @brief Inputok kezelése játéknézetben.
+ *
+ * @param this A `Carcassone` struktúra, amihez tartozik a játéknézet.
+ * @param dt Deltaidő.
+ */
 void Carcassone__Game__handle_input(Carcassone* this, float dt)
 {
     SDL_Event event;
@@ -148,7 +154,7 @@ void Carcassone__Game__handle_input(Carcassone* this, float dt)
             if(!(this->state == GAME && !this->game_screen->is_ready)) break;
             if(event.text.text[0] == ' ') break;
 
-            if(get_utf8_length(this->game_screen->active_input->prompt.label) < 24) {
+            if(mb_strlen(this->game_screen->active_input->prompt.label) < 24) {
                 Carcassone__Prompt__edit(this, this->game_screen->active_input, event.text.text, true);
             }
             break;
@@ -162,7 +168,7 @@ void Carcassone__Game__handle_input(Carcassone* this, float dt)
         case SDL_KEYDOWN:
             switch(event.key.keysym.sym) {
                 case SDLK_BACKSPACE:
-                    if(get_utf8_length(this->game_screen->active_input->prompt.label) > 0) {
+                    if(mb_strlen(this->game_screen->active_input->prompt.label) > 0) {
                         Carcassone__Prompt__edit(this, this->game_screen->active_input, NULL, false);
                     }
                     break;
@@ -196,12 +202,12 @@ void Carcassone__Game__handle_input(Carcassone* this, float dt)
                     if(this->game_screen->curr_player->has_placed_card) {
                         Carcassone__Game__calculate_points(this);
                         if(!Carcassone__Game__draw_new(this)) {
-                            Carcassone__Game__wrapup(this);
+                            Carcassone__Game__wrapup(this, false);
                         }
                     }
                 }
                 if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->game_screen->concede_button.global_rect))
-                    Carcassone__Game__wrapup(this);
+                    Carcassone__Game__wrapup(this, true);
                 
                 for(int y = 0; y < BOARD_SIZE; ++y) {
                     for(int x = 0; x < BOARD_SIZE; ++x) {
@@ -229,6 +235,8 @@ void Carcassone__Game__handle_input(Carcassone* this, float dt)
             break;
     }
 
+    // Külön Carcassone__Game__update függvény jó lenne csak ennek.
+    // És akkor nem kéne az inputkezelőnek a deltaidőt passolni.
     if(this->game_screen->is_ready) Carcassone__Game__move_board(this, dt);
 }
 
@@ -275,12 +283,22 @@ void Carcassone__Game__render(Carcassone* this)
     }
 }
 
+/**
+ * @brief Leellenőrzi, hogy a két megadott játékos név helyes e.
+ *
+ * Ellenőrzi a hosszúságukat és hogy nem e ugyanazok.
+ *
+ * @param this A `Carcassone` struktúra, amihez a nézet tartozik.
+ * @return Helyesek e.
+ */
 bool Carcassone__Game__check_names_valid(Carcassone* this)
 {
+    // Hosszuúság teszt.
     for(size_t p = 0U; p < 2; ++p) {
-        if(strlen(this->game_screen->player_name_inputs[p].prompt.label) == 0) return false;
+        if(mb_strlen(this->game_screen->player_name_inputs[p].prompt.label) == 0) return false;
     }
 
+    // Ugyanazok e.
     if(strcmp(this->game_screen->player_name_inputs[0].prompt.label, this->game_screen->player_name_inputs[1].prompt.label) == 0) return false;
 
     return true;
@@ -289,9 +307,9 @@ bool Carcassone__Game__check_names_valid(Carcassone* this)
 /**
  * @brief Játékosok létrehozása.
  * 
- * Inicializálja a két játékost előre megadott adatok alapján (ezek a GameScreenben találhatók).
+ * Inicializálja a két játékost előre megadott adatok alapján (ezek a `GameScreen`-ben találhatók).
  *
- * @param this A Carcassone struktúra.
+ * @param this A `Carcassone` struktúra.
  */
 void Carcassone__Game__init_players(Carcassone* this)
 {
@@ -308,7 +326,7 @@ void Carcassone__Game__init_players(Carcassone* this)
  * 
  * Véletlenszerűen megkeveri a paklit és létrehozza a mezőkártyákat mindegyikhez.
  *
- * @param this A Carcassone struktúra.
+ * @param this A `Carcassone` struktúra.
  */
 void Carcassone__Game__init_pile(Carcassone* this)
 {
@@ -368,17 +386,18 @@ void Carcassone__Game__init_pile(Carcassone* this)
  * 
  * Létrehozza a játéktáblát és le is helyezi a kezdőkártyát.
  *
- * @param this A Carcassone struktúra.
+ * @param this A `Carcassone` struktúra.
  */
 void Carcassone__Game__init_board(Carcassone* this)
 {
-    // ! debugmalloc falsely claims the code below produces a memory leak
-    // ! it does not, free happens inside Carcassone__Game__destroy() without any issues
+    // ! a debugmalloc hibásan gondolja azt hogy nincs felszabadítva ez a memória
+    // ! de ez nem igaz, hibátlanul fel lesz szabadítva a `Carcassone__Game__destroy`-ban
     this->game_screen->board = malloc(BOARD_SIZE * sizeof(Tile*));
     for(size_t n = 0U; n < BOARD_SIZE; ++n) {
         this->game_screen->board[n] = malloc(BOARD_SIZE * sizeof(Tile));
     }
 
+    // Tábla celláinak létrehozása (üres először mind).
     for(int y = 0; y < BOARD_SIZE; ++y) {
         for(int x = 0; x < BOARD_SIZE; ++x) {
             Tile__construct(&this->game_screen->board[x][y], EMPTY, (SDL_Point){x, y}, this->game_screen->board_offset);
@@ -388,7 +407,7 @@ void Carcassone__Game__init_board(Carcassone* this)
         }
     }
 
-    // Kezdőkártya
+    // Kezdőkártya lehelyezése a tábla közepén.
     Tile__construct(&this->game_screen->board[BOARD_SIZE / 2][BOARD_SIZE / 2], CASTLE_CAP_WALL_ROAD_BY,
         (SDL_Point){BOARD_SIZE / 2, BOARD_SIZE / 2}, this->game_screen->board_offset);
     Tile__move_by(&this->game_screen->board[BOARD_SIZE / 2][BOARD_SIZE / 2], 
@@ -399,7 +418,7 @@ void Carcassone__Game__init_board(Carcassone* this)
 /**
  * @brief Játéktábla renderelése.
  * 
- * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
+ * @param this A `Carcassone` struktúra, ami tartalmazza a renderert.
  */
 void Carcassone__Game__render_board(Carcassone* this)
 {
@@ -434,7 +453,7 @@ void Carcassone__Game__render_board(Carcassone* this)
 /**
  * @brief A pakli tetején levő kártya és a pakli méretének renderelése.
  * 
- * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
+ * @param this A `Carcassone` struktúra, ami tartalmazza a renderert.
  */
 void Carcassone__Game__render_drawn_tile(Carcassone* this)
 {
@@ -475,6 +494,11 @@ void Carcassone__Game__render_drawn_tile(Carcassone* this)
     }
 }
 
+/**
+ * @brief A lehelyezett alattvalók renderelése.
+ * 
+ * @param this A `Carcassone` struktúra, ami tartalmazza a renderert.
+ */
 void Carcassone__Game__render_meeples(Carcassone* this)
 {
     SDL_Rect rect;
@@ -503,6 +527,13 @@ void Carcassone__Game__render_meeples(Carcassone* this)
     }
 }
 
+/**
+ * @brief A "game over" állapot megjelenítése.
+ *
+ * Megjeleníti a koronát a nyertes játékos stat panelje felett.
+ * 
+ * @param this A `Carcassone` struktúra, ami tartalmazza a renderert.
+ */
 void Carcassone__Game__render_game_over(Carcassone* this)
 {
     if(this->game_screen->winner == NULL) return;
@@ -539,6 +570,12 @@ void Carcassone__Game__indicate_possible_placements(Carcassone* this)
     }
 }
 
+/**
+ * @brief Megnézi, hogy a húzott kártyát valahova le lehet e tenni.
+ *
+ * @param this
+ * @return Le lehet e tenni a húzott kártyát valahova.
+ */
 bool Carcassone__Game__check_if_possible(Carcassone* this)
 {
     if(this->game_screen->drawn_tile == NULL) return false;
@@ -563,6 +600,11 @@ bool Carcassone__Game__check_if_possible(Carcassone* this)
     return false;
 }
 
+/**
+ * @brief A megfelelő pontszámító függvényeknek delegálja a feladatot.
+ *
+ * @param this
+ */
 void Carcassone__Game__calculate_points(Carcassone* this)
 {
     for(int y = 0; y < BOARD_SIZE; ++y) {
@@ -577,6 +619,12 @@ void Carcassone__Game__calculate_points(Carcassone* this)
     }
 }
 
+/**
+ * @brief Kolostorok pontszámítása.
+ *
+ * @param this
+ * @param tile
+ */
 void Carcassone__Game__calculate_scores_for_cloister(Carcassone* this, Tile* tile)
 {
     if(this->game_screen->is_game_over) return;
@@ -607,7 +655,13 @@ void Carcassone__Game__calculate_scores_for_cloister(Carcassone* this, Tile* til
     }
 }
 
-// TODO
+/**
+ * @brief Utak és várak pontszámítása.
+ *
+ * @param this
+ * @param tile
+ * @param conn_type
+ */
 void Carcassone__Game__calculate_scores_for_graph(Carcassone* this, Tile* tile, ConnectionType conn_type)
 {
     bool has_approp_conn = false;
@@ -624,7 +678,6 @@ void Carcassone__Game__calculate_scores_for_graph(Carcassone* this, Tile* tile, 
     SDL_Point dir_rel_coords[4] = {
         {0, -1}, {1, 0}, {0, 1}, {-1, 0}
     };
-
 
     size_t visited_idx = 0U;
     Tile* visited[PILE_SIZE] = {0};
@@ -679,11 +732,11 @@ void Carcassone__Game__calculate_scores_for_graph(Carcassone* this, Tile* tile, 
             for(size_t m = 0U; m < MAX_MEEPLES; ++m) {
                 Meeple* curr_m = &this->game_screen->players[p].meeples[m];
                 if(!curr_m->is_placed) continue;
+                visited[i]->is_scored = true;
                 if(curr_m->x != visited[i]->board_coords.x || curr_m->y != visited[i]->board_coords.y) continue;
 
                 Player__add_to_score(&this->game_screen->players[p], points);
                 Player__reclaim_meeple(&this->game_screen->players[p], curr_m);
-                visited[i]->is_scored = true;
                 DBG_LOG("Added score (%u) to: %s", conn_type, this->game_screen->players[p].name);
             }
         }
@@ -693,7 +746,7 @@ void Carcassone__Game__calculate_scores_for_graph(Carcassone* this, Tile* tile, 
 /**
  * @brief A splash cím renderelése.
  * 
- * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
+ * @param this A `Carcassone` struktúra, ami tartalmazza az SDL kontextust.
  */
 void Carcassone__Game__render_player_stats(Carcassone* this)
 {   
@@ -723,8 +776,8 @@ void Carcassone__Game__render_player_stats(Carcassone* this)
  * 
  * A nyilak segítségével a játéktábla látható részét mozgatja.
  *
- * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
- * @param key A beolvasott billentyű (a Carcassone__handle_inputs(Carcassone*)-tól kapja meg).
+ * @param this A `Carcassone` struktúra, ami tartalmazza az SDL kontextust.
+ * @param dt Deltaidő.
  */
 void Carcassone__Game__move_board(Carcassone* this, float dt)
 {
@@ -755,7 +808,7 @@ void Carcassone__Game__move_board(Carcassone* this, float dt)
 /**
  * @brief Helyes pozíció ellenőrzése.
  * 
- * @param this A Carcassone struktúra, ami tartalmazza az SDL kontextust.
+ * @param this A `Carcassone struktúra`, ami tartalmazza a játéknézetet.
  * @param tcoords A kapott kártya potenciális helye a táblán.
  * @return Letehető-e a megfelelő pozícióba az adott kártya.
  */
@@ -790,10 +843,9 @@ bool Carcassone__Game__check_surrounding_tiles(Carcassone* this, SDL_Point tcoor
 
 /**
  * @brief Új kártya húzása a pakli tetejéről.
- * 
- * Húz egy új kártyát, ha kifogyott akkor kilép a menübe (egyelőre).
  *
- * @param this A Carcassone struktúra.
+ * @param this A `Carcassone` struktúra.
+ * @return Lehet e még húzni (ha üres a pakli: false).
  */
 bool Carcassone__Game__draw_new(Carcassone* this)
 {
@@ -825,6 +877,13 @@ bool Carcassone__Game__draw_new(Carcassone* this)
     return true;
 }
 
+/**
+ * @brief A `Carcassone__Game__wrapup` segédfüggvénye.
+ *
+ * Visszalép a menübe ha lejár az időzítő.
+ *
+ * @return 0
+ */
 static unsigned int return_to_menu(unsigned int interval, void* this)
 {  
     Carcassone* thiz = (Carcassone*) this;
@@ -833,15 +892,29 @@ static unsigned int return_to_menu(unsigned int interval, void* this)
     SDL_UnlockMutex(thiz->smutex);
     return 0;
 }
-void Carcassone__Game__wrapup(Carcassone* this)
+
+/**
+ * @brief "Game over" szituáció menedzselése.
+ *
+ * Nyertes kiválasztása, dicsőséglista frissítése és visszatérés a menübe.
+ *
+ * @param this A `Carcassone` struktúra, amihez a a nézet tartozik.
+ * @param concede Feladás történt e.
+ */
+void Carcassone__Game__wrapup(Carcassone* this, bool concede)
 {
     this->game_screen->is_game_over = true;
 
     if(this->game_screen->players[0].score == this->game_screen->players[1].score) {
         this->game_screen->winner = NULL;
     } else {
-        this->game_screen->winner = 
-            this->game_screen->players[0].score > this->game_screen->players[1].score ? &this->game_screen->players[0] : &this->game_screen->players[1];
+        if(concede) {
+            this->game_screen->winner = 
+                this->game_screen->curr_player == &this->game_screen->players[0] ? &this->game_screen->players[1] : &this->game_screen->players[0];
+        } else {
+            this->game_screen->winner = 
+                this->game_screen->players[0].score > this->game_screen->players[1].score ? &this->game_screen->players[0] : &this->game_screen->players[1];
+        }
     }
     if(this->lboard_screen->leaderboard != NULL) {
         Leaderboard__insert_new(this->lboard_screen->leaderboard, this->game_screen->winner);

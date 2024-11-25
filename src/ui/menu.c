@@ -25,7 +25,7 @@ void Carcassone__Menu__construct(Carcassone* this)
 
     this->menu_screen->button_container = (SDL_Rect){this->width/2 - 400, 250, 800, 600};
 
-    // Gombok létrehozása
+    // Gombok létrehozása.
     SDL_Rect start_button_rect = {
         this->menu_screen->button_container.x + this->menu_screen->button_container.w / 2 - 100,
         this->menu_screen->button_container.y + 100,
@@ -56,6 +56,11 @@ void Carcassone__Menu__destroy(Carcassone* this)
     free(this->menu_screen);
 }
 
+/**
+ * @brief Inputok kezelése menünézetben.
+ *
+ * @param this A `Carcassone` struktúra, amihez tartozik a menünézet.
+ */
 void Carcassone__Menu__handle_input(Carcassone* this)
 {
     SDL_Event event;
@@ -66,6 +71,7 @@ void Carcassone__Menu__handle_input(Carcassone* this)
             this->is_running = false;
             break;
         case SDL_MOUSEBUTTONDOWN:
+            // Gombnyomások.
             if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->menu_screen->start_button.global_rect)) {
                 Carcassone__switch_state(this, GAME);
             }
@@ -92,6 +98,7 @@ void Carcassone__Menu__render(Carcassone* this)
     SDL_SetRenderDrawColor(this->renderer, 235, 235, 225, 100);
     SDL_RenderFillRect(this->renderer, NULL);
 
+    // Gombok.
     Carcassone__Button__render(this, &this->menu_screen->start_button);
     Carcassone__Button__render(this, &this->menu_screen->lboard_button);
 

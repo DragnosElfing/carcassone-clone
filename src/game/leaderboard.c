@@ -22,7 +22,7 @@
 Leaderboard* Leaderboard__construct(char const* records_file_path)
 {
     Leaderboard* new_lboard = malloc(sizeof(Leaderboard));
-    new_lboard->records_file_path = strdup_(records_file_path, true);
+    new_lboard->records_file_path = strdup_(records_file_path);
     new_lboard->entries = NULL;
     new_lboard->entries_size = 0U;
     
@@ -40,6 +40,8 @@ Leaderboard* Leaderboard__construct(char const* records_file_path)
  */
 void Leaderboard__destroy(Leaderboard* this)
 {
+    if(this == NULL) return;
+    
     free((char*)this->records_file_path);
     free(this->entries);
     free(this);
@@ -51,7 +53,7 @@ void Leaderboard__destroy(Leaderboard* this)
  * Érdemes meghívni a `Leaderboard__sort`-ot ezután.
  *
  * @param this A `Leaderboard` struktúra, amelyhez már tartozik egy rekordfájl.
- * @return Hibamentesen lefutott e.
+ * @return Hibamentesen futott e le.
  */
 bool Leaderboard__load(Leaderboard* this)
 {

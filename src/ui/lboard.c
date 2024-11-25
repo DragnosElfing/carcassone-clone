@@ -43,6 +43,11 @@ void Carcassone__Lboard__destroy(Carcassone* this)
     free(this->lboard_screen);
 }
 
+/**
+ * @brief Inputok kezelése dicsőglistanézetben.
+ *
+ * @param this A `Carcassone` struktúra, amihez tartozik a dicsőglistanézet.
+ */
 void Carcassone__Lboard__handle_input(Carcassone* this)
 {
     SDL_Event event;
@@ -53,6 +58,7 @@ void Carcassone__Lboard__handle_input(Carcassone* this)
             this->is_running = false;
             break;
         case SDL_MOUSEBUTTONDOWN:
+            // Gombnyomás.
             if(SDL_PointInRect(&(SDL_Point){event.button.x, event.button.y}, &this->lboard_screen->back_button.global_rect)) {
                 Carcassone__switch_state(this, MENU);
             }
@@ -71,6 +77,8 @@ void Carcassone__Lboard__handle_input(Carcassone* this)
  */
 void Carcassone__Lboard__init_list_texture(Carcassone* this)
 {
+    // Nem néz ki sajnos a legjobban.
+
     // A rekordok.
     destroy_SDL_Texture(this->lboard_screen->list_texture);
     this->lboard_screen->list_texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
@@ -125,7 +133,6 @@ void Carcassone__Lboard__init_list_texture(Carcassone* this)
     }
 
     SDL_SetRenderTarget(this->renderer, NULL);
-    // Nem néz ki sajnos a legjobban
     SDL_SetTextureBlendMode(this->lboard_screen->list_texture, SDL_BLENDMODE_BLEND);
 }
 

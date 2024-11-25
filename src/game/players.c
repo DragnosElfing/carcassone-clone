@@ -32,6 +32,17 @@ Meeple Meeple__construct(SDL_Texture* texture)
     return new_meeple;
 }
 
+/**
+ * @brief Létrehoz egy játékost.
+ *
+ * Megjegyzés: A lefoglalt memória megfelelő felszabadításához meg kell hívni a `Player__destroy` függvényt.
+ *
+ * @param renderer A renderer amivel a főablakra rajzolunk.
+ * @param font A statisztikák kiírásához használt betűtípus.
+ * @param name A neve.
+ * @param meeple_outfit Az alattvalóinak kinézete (képfájl).
+ * @return Az új `Player`.
+ */
 Player Player__construct(SDL_Renderer* renderer, TTF_Font* font, char* name, char const* meeple_outfit)
 {   
     Player new_player = {
@@ -40,7 +51,8 @@ Player Player__construct(SDL_Renderer* renderer, TTF_Font* font, char* name, cha
         .meeples_at_hand = MAX_MEEPLES,
         .update_score = true
     };
-    strcpy(new_player.name, get_utf8_length(name) <= 24 ? name : "INVALID");
+    // Ha valahogy több mint 24 karakter, akkor legyen INVALID a neve (biztos, hogy len<24).
+    strcpy(new_player.name, mb_strlen(name) <= 24 ? name : "INVALID");
 
     // Alattvalók létrehozása a játékos számára.
     new_player.own_meeple_texture = create_SDL_texture_from_BMP(renderer, meeple_outfit);
@@ -51,15 +63,15 @@ Player Player__construct(SDL_Renderer* renderer, TTF_Font* font, char* name, cha
     }
 
 
-    // Stat panel létrehozása
-    // Név handle létrehozása
+    // Stat panel létrehozása.
+    // Név handle létrehozása.
     SDL_Surface* handle_surface = TTF_RenderUTF8_Blended_Wrapped(font, new_player.name, (SDL_Color){0, 0, 0, 255}, 300);
     if(handle_surface != NULL) {
         new_player.handle_texture = SDL_CreateTextureFromSurface(renderer, handle_surface);
         SDL_FreeSurface(handle_surface);
     }
 
-    // Pontszámoló létrehozása
+    // Pontszámoló létrehozása.
     char score_string[2] = "0";
     sprintf(score_string, "%u", new_player.score);
     
@@ -70,7 +82,7 @@ Player Player__construct(SDL_Renderer* renderer, TTF_Font* font, char* name, cha
         SDL_FreeSurface(score_surface);
     }
 
-    // Magának a panelnek a létrehozása
+    // Magának a panelnek a létrehozása.
     new_player.stat_panel = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 300, 700);
 
     return new_player;
@@ -83,12 +95,19 @@ Player Player__construct(SDL_Renderer* renderer, TTF_Font* font, char* name, cha
  */
 void Player__destroy(Player* this)
 {
-    destroy_SDL_Texture(this->stat_panel); // TODO: ENNÉL VAN A HIBA
+    destroy_SDL_Texture(this->stat_panel);
     destroy_SDL_Texture(this->handle_texture);
     destroy_SDL_Texture(this->score_counter);
     destroy_SDL_Texture(this->own_meeple_texture);
 }
 
+/**
+ * @brief A megadott játékos statisztájának lerenderelése.
+ *
+ * @param this A `Player` struktúra, aminek a statisztikáját akarjuk megjeleníteni.
+ * @param renderer A renderer amivel a főablakra rajzolunk.
+ * @param font A statisztikák kiírásához használt betűtípus.
+ */
 void Player__render(Player* this, SDL_Renderer* renderer, TTF_Font* font)
 {
     if(this->stat_panel != NULL) {
@@ -98,6 +117,7 @@ void Player__render(Player* this, SDL_Renderer* renderer, TTF_Font* font)
         SDL_SetRenderDrawColor(renderer, COLOR_WHITE);
         SDL_RenderFillRect(renderer, NULL);
 
+        // Eddig elért pontszám textúrájának frissítése.
         char score_str[5+1];
         snprintf(score_str, 6, "%u", this->score);
         if(this->update_score) {
@@ -111,6 +131,7 @@ void Player__render(Player* this, SDL_Renderer* renderer, TTF_Font* font)
             this->update_score = false;
         }
 
+        // Név és pontszám.
         int w, h;
         TTF_SizeUTF8(font, this->name, &w, &h);
         if(this->handle_texture != NULL) 
@@ -121,6 +142,7 @@ void Player__render(Player* this, SDL_Renderer* renderer, TTF_Font* font)
                 &(SDL_Rect){15, 95, w, h});
         }
 
+        // Alattvalók: egymás mellet kicsit eltolva.
         unsigned int offset = 0U;
         for(size_t m = 0U; m < MAX_MEEPLES; ++m) {
             if(this->meeples[m].is_placed) continue;
@@ -155,7 +177,7 @@ void Player__place_meeple(Player* this, SDL_Point tile_index)
         }
     }
 
-    // Lehelyezés
+    // Lehelyezés.
     if(to_be_placed != NULL) {
         to_be_placed->is_placed = true;
         to_be_placed->x = tile_index.x;

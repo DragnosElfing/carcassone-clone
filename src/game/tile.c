@@ -8,6 +8,13 @@
     #include "debug/debugmalloc.h"
 #endif
 
+/**
+ * @brief Létrehozza a kártyapaklit.
+ *
+ * Megjegyzés: A lefoglalt memória megfelelő felszabadításához meg kell hívni a `CardPile__destroy` függvényt.
+ *
+ * @return Pointer az új `CardPile` legelső elemére (mindig EMPTY típust tárol) vagy NULL ha hiba volt.
+ */
 CardPile* CardPile__construct(void)
 {
     CardPile* new_cardpile = malloc(sizeof(CardPile));
@@ -18,6 +25,14 @@ CardPile* CardPile__construct(void)
 
     return new_cardpile;
 }
+
+/**
+ * @brief Felszabadítja a megadott `CardPile` strúktúrát (a legutolsó elemen kell meghívni).
+ *
+ * Rekúrzívan működik.
+ *
+ * @param this A `CardPile`, aminek a lefoglalt memóriáját fel kell szabadítani.
+ */
 void CardPile__destroy(CardPile* this)
 {
     if(this == NULL) return;
@@ -25,6 +40,14 @@ void CardPile__destroy(CardPile* this)
     CardPile__destroy(this->next);
     free(this);
 }
+
+/**
+ * @brief Leveszi és eltárolja a pakli legfelső elemét.
+ *
+ * @param this A pakli aminek leveszi a legfelső elemét.
+ * @param popped Ahova eltárolja a kapott kártyatípust.
+ * @return Pointer a `CardPile` új legfelső elemére vagy NULL ha hiba volt.
+ */
 CardPile* CardPile__pop(CardPile* this, TileType* popped)
 {
     if(this == NULL) {
@@ -38,6 +61,14 @@ CardPile* CardPile__pop(CardPile* this, TileType* popped)
 
     return new_top;
 }
+
+/**
+ * @brief A megadott paklira rátesz egy új kártyát.
+ *
+ * @param this A pakli amire rá kell tenni egy új kártyát.
+ * @param new_type A tárolandó kártyatípus.
+ * @return Pointer az új legfelső elemre vagy NULL ha hiba volt.
+ */
 CardPile* CardPile__push(CardPile* this, TileType new_type)
 {
     CardPile* new_top = CardPile__construct();
@@ -49,7 +80,16 @@ CardPile* CardPile__push(CardPile* this, TileType new_type)
     return new_top;
 }
 
-
+/**
+ * @brief Létrehoz egy mezőkártyát.
+ *
+ * Megjegyzés: A lefoglalt memória megfelelő felszabadításához meg kell hívni a `Tile__destroy` függvényt.
+ *
+ * @param this A létrejövő kártya.
+ * @param type A kártya típusa.
+ * @param board_coords A cella koordinátái a táblán (0 és BOARD_SIZE közt).
+ * @param offset A tábla koordinátái.
+ */
 void Tile__construct(Tile* this, TileType type, SDL_Point board_coords, SDL_FPoint offset)
 {
     if(this == NULL) return;
@@ -65,6 +105,13 @@ void Tile__construct(Tile* this, TileType type, SDL_Point board_coords, SDL_FPoi
     Tile__set_type(this, type, this->rotation);
 }
 
+/**
+ * @brief Ellenőrzi hogy egy pont az adott kártya területében van e.
+ *
+ * @param this A vizsgálandó mezőkártya.
+ * @param pt A vizsgálandó pont.
+ * @return Benne van e a pont.
+ */
 bool Tile__point_in_tile(Tile* this, SDL_FPoint pt)
 {
     if(this == NULL) return false;
@@ -74,6 +121,13 @@ bool Tile__point_in_tile(Tile* this, SDL_FPoint pt)
         && this->global_coords.y < pt.y && pt.y <= this->global_coords.y + TILE_SIZE;
 }
 
+/**
+ * @brief Elmozgatja a megadott mezőkártyát egy adott irányba.
+ *
+ * @param this Az adott `Tile`.
+ * @param mvx Mozgatás az x tengelyen.
+ * @param mvy Mozgatás az y tengelyen.
+ */
 void Tile__move_by(Tile* this, float mvx, float mvy)
 {
     if(this == NULL) return;
@@ -82,6 +136,13 @@ void Tile__move_by(Tile* this, float mvx, float mvy)
     this->global_coords = (SDL_FPoint){this->global_coords.x + mvx * TILE_SIZE, this->global_coords.y + mvy * TILE_SIZE};
 }
 
+/**
+ * @brief Órajárásával megegyező irányába elforgatja 90 fokkal a megadott mezőkártyát.
+ *
+ * Az oldalak `ConnectionType`-jait is megfelelően beállítja.
+ *
+ * @param this Az adott `Tile`.
+ */
 void Tile__rotate(Tile* this)
 {
     if(this == NULL) return;
@@ -89,12 +150,22 @@ void Tile__rotate(Tile* this)
     Tile__set_rotation(this, this->rotation + 90);
 }
 
+/**
+ * @brief A megadott mezőkártyának elforgatását beállítja pontosan a kapott értékre.
+ *
+ * Az oldalak `ConnectionType`-jait is megfelelően beállítja.
+ *
+ * @param this Az adott `Tile`.
+ * @param new_rotation Az elforgatás értéke. 
+ */
 void Tile__set_rotation(Tile* this, unsigned short new_rotation)
 {
     if(this == NULL || !this->rotatable) return;
 
     ConnectionType prev_connections[4];
 
+    // Oldalkapcsolatok forgatása, egymás után amennyiszer kell.
+    // Nem a legjobb megoldás.
     new_rotation %= 360;
     unsigned int r = this->rotation;
     while(r != new_rotation) {
@@ -113,8 +184,18 @@ void Tile__set_rotation(Tile* this, unsigned short new_rotation)
     this->rotation = new_rotation;
 }
 
+/**
+ * @brief Adott mezőkártya típusának megváltoztatása.
+ *
+ * Az oldalak `ConnectionType`-jait is megfelelően beállítja.
+ *
+ * @param this Az adott `Tile`.
+ * @param new_type Az új típusa.
+ * @param new_rotation -
+ */
 void Tile__set_type(Tile* this, TileType new_type, unsigned short new_rotation)
 {
+    // A rotationt nem feltétlen ennek a függvénynek kéne állítania.
     if(this == NULL) return;
 
     this->type = new_type;

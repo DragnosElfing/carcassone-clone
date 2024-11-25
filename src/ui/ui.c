@@ -13,10 +13,25 @@
     #include "debug/debugmalloc.h"
 #endif
 
+/**
+ * @brief Létrehoz egy gombot.
+ *
+ * Megjegyzés: A lefoglalt memória megfelelő felszabadításához meg kell hívni a `Carcassone__Button__destroy` függvényt.
+ *
+ * @param this A renderert tartalmazó `Carcassone` struktúra.
+ * @param font A címkéhez használt betűtípus.
+ * @param label A címke tartalma.
+ * @param global_rect A gomb globális pozíciója (az ablakon).
+ * @param bg_color A gomb színe.
+ * @param text_color A címke színe.
+ * @param center A container-ben középre legyen e igazítva a címke.
+ * @return Az új `Button`.
+ */
 Button Carcassone__Button__construct(Carcassone* this, TTF_Font* font, char* label, SDL_Rect global_rect, SDL_Color bg_color, SDL_Color text_color, bool center)
 {
-    Button new_button = {.label = strdup_(label, true), .bg_color = bg_color, .global_rect = global_rect, .used_font = font};
+    Button new_button = {.label = strdup_(label), .bg_color = bg_color, .global_rect = global_rect, .used_font = font};
 
+    // Címke.
     int rect_width, rect_height;
     TTF_SizeUTF8(font, label, &rect_width, &rect_height);
     new_button.label_rect = (SDL_Rect){
@@ -36,6 +51,24 @@ Button Carcassone__Button__construct(Carcassone* this, TTF_Font* font, char* lab
     return new_button;
 }
 
+/**
+ * @brief Felszabadítja a megadott `Button` struktúra által lefoglalt memóriát.
+ *
+ * @param this A `Carcassone` struktúra, aminek az ablakára az adott gomb renderelve van (nem használt, régi verzió miatt).
+ * @param button A `Button` struktúra, aminek a lefoglalt memóriáját fel kell szabadítani.
+ */
+void Carcassone__Button__destroy(Carcassone* this, Button* button)
+{
+    free(button->label);
+    destroy_SDL_Texture(button->label_texture);
+}
+
+/**
+ * @brief A gomb megjelenítése.
+ *
+ * @param this A `Carcassone` struktúra, amelyhez a renderer tartozik.
+ * @param button A megjelenítendő gomb.
+ */
 void Carcassone__Button__render(Carcassone* this, Button* button)
 {
     SDL_RenderSetViewport(this->renderer, &button->global_rect);
@@ -49,12 +82,19 @@ void Carcassone__Button__render(Carcassone* this, Button* button)
     SDL_RenderSetViewport(this->renderer, NULL);
 }
 
-void Carcassone__Button__destroy(Carcassone* this, Button* button)
-{
-    free(button->label);
-    destroy_SDL_Texture(button->label_texture);
-}
-
+/**
+ * @brief Létrehoz egy szöveginputot.
+ *
+ * Megjegyzés: A lefoglalt memória megfelelő felszabadításához meg kell hívni a `Carcassone__Prompt__destroy` függvényt.
+ *
+ * @param this A renderert tartalmazó `Carcassone` struktúra.
+ * @param font A címkéhez használt betűtípus.
+ * @param default_label A címke tartalma.
+ * @param global_rect A gomb globális pozíciója (az ablakon).
+ * @param bg_color A gomb színe.
+ * @param text_color A címke színe.
+ * @return Az új `Prompt`.
+ */
 Prompt Carcassone__Prompt__construct(Carcassone* this, TTF_Font* font, char* default_label, SDL_Rect global_rect, SDL_Color bg_color, SDL_Color text_color)
 {
     Prompt new_prompt = {
@@ -64,12 +104,46 @@ Prompt Carcassone__Prompt__construct(Carcassone* this, TTF_Font* font, char* def
     return new_prompt;
 }
 
+/**
+ * @brief Felszabadítja a megadott `Prompt` struktúra által lefoglalt memóriát.
+ *
+ * @param this A `Carcassone` struktúra, aminek az ablakára az adott szöveginput renderelve van (nem használt, régi verzió miatt).
+ * @param prompt A `Prompt` struktúra, aminek a lefoglalt memóriáját fel kell szabadítani.
+ */
+void Carcassone__Prompt__destroy(Carcassone* this, Prompt* prompt)
+{
+    Carcassone__Button__destroy(this, &prompt->prompt);
+}
+
+/**
+ * @brief A szöveginput megjelenítése.
+ *
+ * @param this A `Carcassone` struktúra, amelyhez a renderer tartozik.
+ * @param prompt A megjelenítendő szöveginput.
+ */
+void Carcassone__Prompt__render(Carcassone* this, Prompt* prompt)
+{
+    Carcassone__Button__render(this, &prompt->prompt);
+}
+
+/**
+ * @brief Vagy hozzátold a szöveginput címkéjéhez, vagy lecseréli azt.
+ *
+ * @param this A renderert tartalmazó `Carcassone` struktúra.
+ * @param prompt A szöveginput.
+ * @param new_label Az új címke vagy a hozzátoldott szöveg.
+ * @param concat Hozzátoldás e.
+ */
 void Carcassone__Prompt__edit(Carcassone* this, Prompt* prompt, char* new_label, bool concat)
 {   
     if(concat) {
-        prompt->prompt.label = strcatdyn(prompt->prompt.label, new_label, true);
+        if(prompt->prompt.label == NULL || mb_strlen(prompt->prompt.label) == 0) {
+            prompt->prompt.label = strdup_(new_label);
+        } else {
+            prompt->prompt.label = strcatdyn(prompt->prompt.label, new_label);
+        }
     } else {
-        prompt->prompt.label = remove_last_utf8_char_dyn(this->game_screen->active_input->prompt.label);
+        prompt->prompt.label = mb_remove_last_char_dyn(prompt->prompt.label);
     }
 
     destroy_SDL_Texture(prompt->prompt.label_texture);
@@ -86,12 +160,4 @@ void Carcassone__Prompt__edit(Carcassone* this, Prompt* prompt, char* new_label,
     }
 }
 
-void Carcassone__Prompt__render(Carcassone* this, Prompt* prompt)
-{
-    Carcassone__Button__render(this, &prompt->prompt);
-}
 
-void Carcassone__Prompt__destroy(Carcassone* this, Prompt* prompt)
-{
-    Carcassone__Button__destroy(this, &prompt->prompt);
-}
