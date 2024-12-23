@@ -21,12 +21,16 @@ size_t mb_strlen(char const* str)
 {
     if(str == NULL) return 0;
 
-    size_t mb_len = mbstowcs(NULL, str, 0);
-    wchar_t wstr[mb_len + 1];
+    size_t characters = 0U;
+    while(*str != '\0') {
+        if((*str & 0xC0) != 0x80) {
+            ++characters;
+        }
+        ++str;
+    }
+    
 
-    mbstowcs(wstr, str, mb_len + 1);
-
-    return wcslen(wstr);
+    return characters;
 }
 
 /**
